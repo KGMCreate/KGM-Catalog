@@ -245,9 +245,14 @@ img{max-width:100%;display:block;}
 .qitem .info{flex:1;min-width:0;}
 .qitem .info .n{font-size:.85rem;font-weight:600;}
 .qitem .info .p{font-size:.72rem;color:var(--ink-soft);}
+.qitem .qty{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;}
+.qitem .qty label{font-size:.6rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.qitem .qty-input{width:52px;padding:5px 4px;border:1px solid var(--line);border-radius:6px;font-size:.85rem;text-align:center;font-family:inherit;color:var(--ink);background:#fff;}
+.qitem .qty-input:focus{outline:2px solid var(--focus);outline-offset:1px;}
 .qitem button{background:none;border:none;color:var(--steel);cursor:pointer;font-size:1.1rem;padding:4px;}
 .qitem button:hover{color:var(--red);}
 .drawer-empty{padding:40px 20px;text-align:center;color:var(--ink-soft);font-size:.9rem;}
+.drawer-note{padding:10px 20px;font-size:.74rem;color:var(--ink-soft);line-height:1.5;border-top:1px solid var(--line);background:var(--paper-2);}
 .drawer-foot{padding:16px 20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;}
 .drawer-foot .btn{justify-content:center;width:100%;}
 .toast{
@@ -514,6 +519,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <button class="drawer-close" id="closeDrawerBtn" aria-label="Close">✕</button>
   </div>
   <div class="drawer-list" id="drawerList"></div>
+  <div class="drawer-note">Case counts below are requests. All pricing and availability are confirmed by our team before your order is finalized — some items may be limited or temporarily out of stock.</div>
   <div class="drawer-foot">
     <button class="btn btn-primary" id="openQuoteFormBtn">Request a Quote</button>
     <button class="btn" style="border:1px solid var(--line);background:var(--card);" id="openOrderFormBtn">Place an Order</button>
@@ -527,7 +533,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <h2 id="contactModalTitle">Request a Quote</h2>
     <button class="drawer-close" id="closeContactModalBtn" aria-label="Close">✕</button>
   </div>
-  <p class="contact-modal-sub">Add your info so we can get back to you with pricing on the items in your list.</p>
+  <p class="contact-modal-sub" id="contactModalSub">Add your info so we can get back to you with pricing on the items in your list.</p>
   <form id="contactForm">
     <div class="contact-modal-body">
       <div class="field">
@@ -585,7 +591,7 @@ function saveQuote(){
 function isInQuote(sku,name){ return state.quote.some(q=>q.sku===sku && q.name===name); }
 function toggleQuote(item){
   const idx = state.quote.findIndex(q=>q.sku===item.sku && q.name===item.name);
-  if(idx>=0) state.quote.splice(idx,1); else state.quote.push(item);
+  if(idx>=0) state.quote.splice(idx,1); else state.quote.push({...item, cases: item.cases||1});
   saveQuote(); renderCounts(); renderDrawer(); renderButtons();
 }
 function renderCounts(){
@@ -672,11 +678,19 @@ function renderDrawer(){
   list.innerHTML = state.quote.map((it,i)=>`
     <div class="qitem">
       <div class="info"><div class="n">${it.name}</div><div class="p">${it.pack||''} ${it.sku?('· #'+it.sku):''}</div></div>
+      <div class="qty"><label for="qty-${i}">Cases</label><input type="number" min="1" step="1" inputmode="numeric" id="qty-${i}" class="qty-input" data-i="${i}" value="${it.cases||1}"></div>
       <button data-i="${i}" class="rm" aria-label="Remove">✕</button>
     </div>`).join('');
   list.querySelectorAll('.rm').forEach(b=>b.addEventListener('click', e=>{
     const i = +e.currentTarget.dataset.i;
     state.quote.splice(i,1); saveQuote(); renderCounts(); renderDrawer(); renderButtons();
+  }));
+  list.querySelectorAll('.qty-input').forEach(inp=>inp.addEventListener('change', e=>{
+    const i = +e.currentTarget.dataset.i;
+    let v = parseInt(e.currentTarget.value, 10);
+    if(!v || v<1) v = 1;
+    e.currentTarget.value = v;
+    if(state.quote[i]){ state.quote[i].cases = v; saveQuote(); }
   }));
 }
 
@@ -704,6 +718,9 @@ function openContactModal(intent){
   const isOrder = intent==='order';
   document.getElementById('contactModalTitle').textContent = isOrder ? 'Place an Order' : 'Request a Quote';
   document.getElementById('submitContactBtn').textContent = isOrder ? 'Send Order Request' : 'Send Quote Request';
+  document.getElementById('contactModalSub').textContent = isOrder
+    ? 'Add your info below. Case counts are requests — our team confirms exact pricing and availability before your order is finalized, and will follow up right away if any item needs a substitution or has a longer lead time.'
+    : 'Add your info so we can get back to you with pricing on the items in your list.';
   try{
     const saved = JSON.parse(localStorage.getItem('kgm-customer-info')||'{}');
     document.getElementById('custCompany').value = saved.company||'';
@@ -727,7 +744,7 @@ function closeContactModal(){
   document.getElementById('contactModal').classList.remove('open');
 }
 function buildContactText({company,name,email,phone,pref,isOrder}){
-  const itemLines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''}`);
+  const itemLines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
   const intro = isOrder
     ? "Hi KGM Wholesale,\n\nI'd like to place an order for the following:"
     : "Hi KGM Wholesale,\n\nI'd like pricing and availability on the following:";
@@ -738,7 +755,10 @@ function buildContactText({company,name,email,phone,pref,isOrder}){
     `Phone: ${phone}`,
     `Preferred Contact Method: ${pref}`
   ].filter(Boolean);
-  return `${intro}\n\n${itemLines.join('\n')}\n\n---\n${custLines.join('\n')}\n\nThanks!`;
+  const note = isOrder
+    ? "Note: Case counts above are requested quantities. Final pricing and stock availability will be confirmed by our team before this order is processed."
+    : "Note: Quantities above are estimates to help with pricing — final availability will be confirmed by our team.";
+  return `${intro}\n\n${itemLines.join('\n')}\n\n---\n${custLines.join('\n')}\n\n${note}\n\nThanks!`;
 }
 function showContactFallback(plainText){
   const ta = document.getElementById('contactFallbackText');
@@ -747,8 +767,8 @@ function showContactFallback(plainText){
   document.getElementById('contactFallback').classList.add('show');
 }
 function quotePlainText(){
-  const lines = state.quote.map(it=>`- ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''}`);
-  return `Quote request:\n\n${lines.join('\n')}`;
+  const lines = state.quote.map(it=>`- ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
+  return `Quote request:\n\n${lines.join('\n')}\n\nNote: quantities are requested case counts — final availability will be confirmed by our team.`;
 }
 
 function wireEvents(){
