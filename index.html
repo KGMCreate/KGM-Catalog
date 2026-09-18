@@ -188,6 +188,10 @@ img{max-width:100%;display:block;}
 .card h3{font-family:"Source Sans 3";text-transform:none;font-weight:600;font-size:.86rem;margin:0;letter-spacing:0;line-height:1.25;min-height:2.2em;}
 .card .pack{font-size:.74rem;color:var(--ink-soft);}
 .card .sku{font-size:.68rem;color:var(--steel);margin-top:auto;padding-top:6px;}
+.card-qty{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;}
+.card-qty label{font-size:.68rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
+.card-qty input{width:50px;padding:4px 4px;border:1px solid var(--line);border-radius:6px;font-size:.8rem;text-align:center;font-family:inherit;color:var(--ink);background:#fff;}
+.card-qty input:focus{outline:2px solid var(--focus);outline-offset:1px;}
 .addbtn{
   margin-top:8px;width:100%;padding:7px 8px;border-radius:6px;border:1px solid var(--red);
   background:transparent;color:var(--red);font-weight:600;font-size:.76rem;cursor:pointer;
@@ -413,7 +417,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     </div>
     <button class="quote-btn" id="openDrawerBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg>
-      Quote List <span class="count" id="quoteCount">0</span>
+      Checkout <span class="count" id="quoteCount">0</span>
     </button>
   </div>
 </div>
@@ -496,7 +500,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     </div>
     <div class="col screen-only">
       <b>Ordering</b>
-      Add items to your Quote List as you browse, then email the list straight to our sales team for pricing &amp; availability.
+      Add items to your Checkout as you browse — set case counts if you know them, or leave at 1 for a quick quote. Then request a quote or place an order straight to our sales team.
     </div>
     <div class="col print-only">
       <b>Ordering</b>
@@ -509,13 +513,13 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
 </footer>
 
-<button class="fab" id="fabBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg> Quote List <span class="count" id="fabCount">0</span></button>
+<button class="fab" id="fabBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg> Checkout <span class="count" id="fabCount">0</span></button>
 <button class="back-to-top" id="backToTopBtn" aria-label="Back to top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>
 
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <h2>Your Quote List</h2>
+    <h2>Your Checkout</h2>
     <button class="drawer-close" id="closeDrawerBtn" aria-label="Close">✕</button>
   </div>
   <div class="drawer-list" id="drawerList"></div>
@@ -603,7 +607,7 @@ function renderButtons(){
     const sku = btn.dataset.sku, name = btn.dataset.name;
     const on = isInQuote(sku,name);
     btn.classList.toggle('added', on);
-    btn.textContent = on ? 'Added' : 'Add to Quote List';
+    btn.textContent = on ? 'Added' : 'Add to Checkout';
   });
 }
 
@@ -631,7 +635,8 @@ function productCard(it, catName){
       <h3>${it.name}</h3>
       ${it.pack ? `<div class="pack">${it.pack}</div>` : ''}
       ${it.sku && it.sku!=='—' ? `<div class="sku mono">#${it.sku}</div>` : '<div class="sku">&nbsp;</div>'}
-      <button class="addbtn ${on?'added':''}" data-sku="${it.sku}" data-name="${it.name.replace(/"/g,'&quot;')}" data-pack="${(it.pack||'').replace(/"/g,'&quot;')}">${on?'Added':'Add to Quote List'}</button>
+      <div class="card-qty"><label>Cases</label><input type="number" min="1" step="1" inputmode="numeric" class="card-qty-input" value="1" aria-label="Cases of ${it.name.replace(/"/g,'&quot;')}"></div>
+      <button class="addbtn ${on?'added':''}" data-sku="${it.sku}" data-name="${it.name.replace(/"/g,'&quot;')}" data-pack="${(it.pack||'').replace(/"/g,'&quot;')}">${on?'Added':'Add to Checkout'}</button>
     </div>
   </div>`;
 }
@@ -672,7 +677,7 @@ function spiceBlock(){
 function renderDrawer(){
   const list = document.getElementById('drawerList');
   if(state.quote.length===0){
-    list.innerHTML = '<div class="drawer-empty">Your quote list is empty.<br>Browse the catalog and tap “Add to Quote List” on anything you want pricing on.</div>';
+    list.innerHTML = '<div class="drawer-empty">Your checkout is empty.<br>Browse the catalog and tap “Add to Checkout” on anything you need — set case counts as you go, or leave at 1 for a quick quote.</div>';
     return;
   }
   list.innerHTML = state.quote.map((it,i)=>`
@@ -862,7 +867,11 @@ function wireEvents(){
   document.getElementById('catalog').addEventListener('click', e=>{
     const btn = e.target.closest('.addbtn');
     if(!btn) return;
-    toggleQuote({sku:btn.dataset.sku, name:btn.dataset.name, pack:btn.dataset.pack});
+    const card = btn.closest('.card');
+    const qtyInput = card ? card.querySelector('.card-qty-input') : null;
+    let cases = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+    if(!cases || cases < 1) cases = 1;
+    toggleQuote({sku:btn.dataset.sku, name:btn.dataset.name, pack:btn.dataset.pack, cases});
   });
   document.getElementById('catalog').addEventListener('click', e=>{
     const t = e.target.closest('#spiceToggle');
