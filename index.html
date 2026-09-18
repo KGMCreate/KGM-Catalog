@@ -579,6 +579,10 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
         <input type="tel" id="custPhone" placeholder="(313) 555-0100">
       </div>
       <div class="field">
+        <label for="custReferral">Referred By <span style="font-weight:400;opacity:.65;">(optional)</span></label>
+        <input type="text" id="custReferral" placeholder="e.g. Nick, Mario, Marvin, a friend, or found us online">
+      </div>
+      <div class="field">
         <label>How should we follow up? *</label>
         <div class="radio-group">
           <label class="radio-opt"><input type="radio" name="contactPref" value="Email" checked> Email</label>
@@ -783,6 +787,7 @@ function openContactModal(intent){
     document.getElementById('custName').value = saved.name||'';
     document.getElementById('custEmail').value = saved.email||'';
     document.getElementById('custPhone').value = saved.phone||'';
+    document.getElementById('custReferral').value = saved.referral||'';
     if(saved.pref==='Text'){
       const t = document.querySelector('input[name="contactPref"][value="Text"]');
       if(t) t.checked = true;
@@ -800,7 +805,7 @@ function closeContactModal(){
   document.getElementById('contactModalOverlay').classList.remove('open');
   document.getElementById('contactModal').classList.remove('open');
 }
-function buildContactText({company,name,email,phone,pref,isOrder}){
+function buildContactText({company,name,email,phone,pref,referral,isOrder}){
   const itemLines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
   const intro = isOrder
     ? "Hi KGM Wholesale,\n\nI'd like to place an order for the following:"
@@ -810,7 +815,8 @@ function buildContactText({company,name,email,phone,pref,isOrder}){
     name ? `Contact Name: ${name}` : null,
     `Email: ${email}`,
     `Phone: ${phone}`,
-    `Preferred Contact Method: ${pref}`
+    `Preferred Contact Method: ${pref}`,
+    referral ? `Referred By: ${referral}` : null
   ].filter(Boolean);
   const note = isOrder
     ? "Note: Case counts above are requested quantities. Final pricing and stock availability will be confirmed by our team before this order is processed."
@@ -875,6 +881,7 @@ function wireEvents(){
     const name = document.getElementById('custName').value.trim();
     const email = document.getElementById('custEmail').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
+    const referral = document.getElementById('custReferral').value.trim();
     const prefEl = document.querySelector('input[name="contactPref"]:checked');
     const pref = prefEl ? prefEl.value : 'Email';
     const errEl = document.getElementById('contactFormError');
@@ -890,11 +897,11 @@ function wireEvents(){
     errEl.textContent = '';
 
     try{
-      localStorage.setItem('kgm-customer-info', JSON.stringify({company,name,email,phone,pref}));
+      localStorage.setItem('kgm-customer-info', JSON.stringify({company,name,email,phone,pref,referral}));
     }catch(e){}
 
     const isOrder = contactIntent === 'order';
-    const plainText = buildContactText({company,name,email,phone,pref,isOrder});
+    const plainText = buildContactText({company,name,email,phone,pref,referral,isOrder});
     const subject = `${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
 
     const submitBtn = document.getElementById('submitContactBtn');
@@ -916,6 +923,7 @@ function wireEvents(){
           email: email,
           phone: phone,
           preferred_contact: pref,
+          referred_by: referral || '(not provided)',
           request_type: isOrder ? 'Order Request' : 'Quote Request',
           message: plainText,
           botcheck: false
