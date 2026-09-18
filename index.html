@@ -540,6 +540,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
   <p class="contact-modal-sub" id="contactModalSub">Add your info so we can get back to you with pricing on the items in your list.</p>
   <form id="contactForm">
+    <input type="text" name="hp_field" id="hpField" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
     <div class="contact-modal-body">
       <div class="field">
         <label for="custCompany">Company Name *</label>
@@ -642,8 +643,8 @@ function productCard(it, catName){
       <h3>${it.name}</h3>
       ${it.pack ? `<div class="pack">${it.pack}</div>` : ''}
       ${it.sku && it.sku!=='—' ? `<div class="sku mono">#${it.sku}</div>` : '<div class="sku">&nbsp;</div>'}
-      <div class="card-qty"><label>Cases</label><input type="number" min="1" step="1" inputmode="numeric" class="card-qty-input" value="1" aria-label="Cases of ${it.name.replace(/"/g,'&quot;')}"></div>
-      <button class="addbtn ${on?'added':''}" data-sku="${it.sku}" data-name="${it.name.replace(/"/g,'&quot;')}" data-pack="${(it.pack||'').replace(/"/g,'&quot;')}">${on?'Added':'Add to Checkout'}</button>
+      <div class="card-qty"><label>Cases</label><input type="number" min="1" step="1" inputmode="numeric" class="card-qty-input" value="${on ? (state.quote.find(q=>q.sku===it.sku && q.name===it.name)?.cases||1) : 1}" aria-label="Cases of ${it.name.replace(/"/g,'&quot;')}"></div>
+      <button class="addbtn ${on?'added':''}" data-sku="${it.sku}" data-name="${it.name.replace(/"/g,'&quot;')}" data-pack="${(it.pack||'').replace(/"/g,'&quot;')}" data-img="${it.img}">${on?'Added':'Add to Checkout'}</button>
     </div>
   </div>`;
 }
@@ -689,6 +690,7 @@ function renderDrawer(){
   }
   list.innerHTML = state.quote.map((it,i)=>`
     <div class="qitem">
+      ${it.img ? `<img src="${it.img}" alt="" loading="lazy" width="48" height="48">` : ''}
       <div class="info"><div class="n">${it.name}</div><div class="p">${it.pack||''} ${it.sku?('· #'+it.sku):''}</div></div>
       <div class="qty"><label for="qty-${i}">Cases</label><input type="number" min="1" step="1" inputmode="numeric" id="qty-${i}" class="qty-input" data-i="${i}" value="${it.cases||1}"></div>
       <button data-i="${i}" class="rm" aria-label="Remove">✕</button>
@@ -715,11 +717,6 @@ function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2200);
-}
-
-function quoteText(){
-  const lines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''}`);
-  return `Hi KGM Wholesale,%0D%0A%0D%0AI'd like pricing and availability on:%0D%0A%0D%0A${lines.join('%0D%0A')}%0D%0A%0D%0AThanks!`;
 }
 
 const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
@@ -811,6 +808,14 @@ function wireEvents(){
 
   document.getElementById('contactForm').addEventListener('submit', async e=>{
     e.preventDefault();
+    // Honeypot: real visitors never see or fill this field, so anything in it means a bot.
+    // Pretend success so the bot doesn't learn to try harder, but don't actually send.
+    if(document.getElementById('hpField').value){
+      const isOrderBot = contactIntent === 'order';
+      showToast(isOrderBot ? 'Order request sent!' : 'Quote request sent!');
+      showContactSuccess();
+      return;
+    }
     const company = document.getElementById('custCompany').value.trim();
     const name = document.getElementById('custName').value.trim();
     const email = document.getElementById('custEmail').value.trim();
@@ -928,7 +933,26 @@ function wireEvents(){
     const qtyInput = card ? card.querySelector('.card-qty-input') : null;
     let cases = qtyInput ? parseInt(qtyInput.value, 10) : 1;
     if(!cases || cases < 1) cases = 1;
-    toggleQuote({sku:btn.dataset.sku, name:btn.dataset.name, pack:btn.dataset.pack, cases});
+    toggleQuote({sku:btn.dataset.sku, name:btn.dataset.name, pack:btn.dataset.pack, img:btn.dataset.img, cases});
+  });
+  // If someone changes the case count on a card that's already in the checkout,
+  // update the quantity in place instead of requiring a remove-and-re-add.
+  document.getElementById('catalog').addEventListener('change', e=>{
+    const inp = e.target.closest('.card-qty-input');
+    if(!inp) return;
+    const card = inp.closest('.card');
+    const btn = card ? card.querySelector('.addbtn') : null;
+    if(!btn) return;
+    let v = parseInt(inp.value, 10);
+    if(!v || v<1) v = 1;
+    inp.value = v;
+    const idx = state.quote.findIndex(q=>q.sku===btn.dataset.sku && q.name===btn.dataset.name);
+    if(idx>=0){
+      state.quote[idx].cases = v;
+      saveQuote();
+      renderDrawer();
+      showToast('Quantity updated in checkout');
+    }
   });
   document.getElementById('catalog').addEventListener('click', e=>{
     const t = e.target.closest('#spiceToggle');
@@ -965,6 +989,12 @@ function wireEvents(){
   });
   document.getElementById('clearSearch').addEventListener('click', e=>{
     e.preventDefault(); search.value=''; search.dispatchEvent(new Event('input'));
+  });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key !== 'Escape') return;
+    if(document.getElementById('contactModal').classList.contains('open')) closeContactModal();
+    else if(document.getElementById('drawer').classList.contains('open')) openDrawer(false);
   });
 
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
