@@ -121,6 +121,12 @@ img{max-width:100%;display:block;}
   white-space:nowrap;
 }
 .quote-btn:hover{background:var(--red-deep);}
+.theme-toggle{
+  flex:0 0 auto;width:38px;height:38px;border-radius:8px;background:transparent;
+  border:1px solid #443c2e;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle:hover{border-color:var(--gold);color:var(--gold);}
+.theme-toggle svg{width:18px;height:18px;}
 .quote-btn .count{background:#fff;color:var(--red);border-radius:99px;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;padding-inline:5px;}
 
 /* ---------- Category chip nav ---------- */
@@ -415,6 +421,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a89d87" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input id="searchInput" type="text" placeholder="Search 226+ products or item #…" aria-label="Search products">
     </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" title="Switch color theme"></button>
     <button class="quote-btn" id="openDrawerBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg>
       Checkout <span class="count" id="quoteCount">0</span>
@@ -441,6 +448,10 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
         Request a Quote
       </a>
       <a href="#cat-1" class="btn btn-ghost">Browse the Catalog ↓</a>
+      <button type="button" class="btn btn-ghost" id="printCatalogBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save as PDF
+      </button>
     </div>
     <div class="contact-strip">
       <div class="item">
@@ -713,6 +724,32 @@ function openDrawer(open){
   document.getElementById('drawerOverlay').classList.toggle('open', open);
 }
 
+const SUN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+const MOON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+function getStoredTheme(){ try{ return localStorage.getItem('kgm-theme'); }catch(e){ return null; } }
+function effectiveTheme(){
+  const stored = getStoredTheme();
+  if(stored==='light' || stored==='dark') return stored;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+function updateThemeToggle(){
+  const btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  const eff = effectiveTheme();
+  // Icon shown is the mode you'll switch TO, matching common convention.
+  btn.innerHTML = eff==='dark' ? SUN_ICON : MOON_ICON;
+  btn.setAttribute('aria-label', eff==='dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+function applyTheme(theme){
+  if(theme==='light' || theme==='dark'){
+    document.documentElement.setAttribute('data-theme', theme);
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  updateThemeToggle();
+}
+
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -789,6 +826,15 @@ function quotePlainText(){
 }
 
 function wireEvents(){
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    const next = effectiveTheme()==='dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('kgm-theme', next); }catch(e){}
+    applyTheme(next);
+  });
+  document.getElementById('printCatalogBtn').addEventListener('click', ()=>{
+    window.print();
+  });
+
   document.getElementById('openDrawerBtn').addEventListener('click', ()=>openDrawer(true));
   document.getElementById('fabBtn').addEventListener('click', ()=>openDrawer(true));
   const backToTop = document.getElementById('backToTopBtn');
@@ -1010,6 +1056,7 @@ function wireEvents(){
   });
 }
 
+applyTheme(getStoredTheme());
 renderNav();
 renderToc();
 renderCatalog();
