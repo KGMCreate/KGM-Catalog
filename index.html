@@ -336,6 +336,15 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   .contact-strip{gap:16px;}
   .hero .wrap{padding-block:36px 26px;}
 }
+@media (max-width:480px){
+  .topbar .wrap{gap:8px;}
+  .brand .name{font-size:.8rem;}
+  .brand .name small{font-size:.58rem;}
+  .brand img{width:32px;height:32px;}
+  .theme-toggle{width:34px;height:34px;}
+  .quote-btn{padding:10px 10px;}
+  .quote-btn .qbtn-label{display:none;}
+}
 
 /* ---------- Print ---------- */
 @media print{
@@ -424,7 +433,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" title="Switch color theme"></button>
     <button class="quote-btn" id="openDrawerBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg>
-      Checkout <span class="count" id="quoteCount">0</span>
+      <span class="qbtn-label">Checkout</span> <span class="count" id="quoteCount">0</span>
     </button>
   </div>
 </div>
