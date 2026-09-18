@@ -570,8 +570,14 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
       <button type="submit" class="btn btn-primary" id="submitContactBtn">Send Quote Request</button>
     </div>
   </form>
+  <div class="contact-fallback" id="contactSuccess">
+    <p class="contact-modal-sub" style="padding:0 0 4px;">✅ Your request has been sent to our team — we'll follow up shortly at the email or phone number you provided.</p>
+    <div class="drawer-foot">
+      <button type="button" class="btn btn-primary" id="doneSuccessBtn" style="flex:1;">Done</button>
+    </div>
+  </div>
   <div class="contact-fallback" id="contactFallback">
-    <p class="contact-modal-sub" style="padding:0 0 4px;">Your email app should be opening now. If it didn't, copy the message below and send it to <b>Contact@kgmwholesale.com</b> (or text it to us).</p>
+    <p class="contact-modal-sub" style="padding:0 0 4px;">We couldn't reach our server just now. Your email app should be opening as a backup — if it didn't, copy the message below and send it to <b>Contact@kgmwholesale.com</b> (or text it to us).</p>
     <textarea id="contactFallbackText" class="fallback-textarea" readonly rows="8"></textarea>
     <div class="drawer-foot" style="display:flex;gap:10px;">
       <button type="button" class="btn btn-ghost" id="copyFallbackBtn" style="flex:1;">Copy Message</button>
@@ -716,6 +722,7 @@ function quoteText(){
   return `Hi KGM Wholesale,%0D%0A%0D%0AI'd like pricing and availability on:%0D%0A%0D%0A${lines.join('%0D%0A')}%0D%0A%0D%0AThanks!`;
 }
 
+const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
 let contactIntent = 'quote';
 
 function openContactModal(intent){
@@ -741,6 +748,7 @@ function openContactModal(intent){
   document.getElementById('contactFormError').textContent = '';
   document.getElementById('contactForm').style.display = '';
   document.getElementById('contactFallback').classList.remove('show');
+  document.getElementById('contactSuccess').classList.remove('show');
   document.getElementById('contactModalOverlay').classList.add('open');
   document.getElementById('contactModal').classList.add('open');
   openDrawer(false);
@@ -770,7 +778,13 @@ function showContactFallback(plainText){
   const ta = document.getElementById('contactFallbackText');
   ta.value = plainText;
   document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('contactSuccess').classList.remove('show');
   document.getElementById('contactFallback').classList.add('show');
+}
+function showContactSuccess(){
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('contactFallback').classList.remove('show');
+  document.getElementById('contactSuccess').classList.add('show');
 }
 function quotePlainText(){
   const lines = state.quote.map(it=>`- ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
@@ -795,7 +809,7 @@ function wireEvents(){
   document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
   document.getElementById('contactModalOverlay').addEventListener('click', closeContactModal);
 
-  document.getElementById('contactForm').addEventListener('submit', e=>{
+  document.getElementById('contactForm').addEventListener('submit', async e=>{
     e.preventDefault();
     const company = document.getElementById('custCompany').value.trim();
     const name = document.getElementById('custName').value.trim();
@@ -821,18 +835,60 @@ function wireEvents(){
 
     const isOrder = contactIntent === 'order';
     const plainText = buildContactText({company,name,email,phone,pref,isOrder});
-    const subject = encodeURIComponent(`${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`);
-    const url = `mailto:Contact@kgmwholesale.com?subject=${subject}&body=${encodeURIComponent(plainText)}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    const subject = `${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
 
-    showToast('Opening your email app…');
-    showContactFallback(plainText);
+    const submitBtn = document.getElementById('submitContactBtn');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    let sent = false;
+    try{
+      const resp = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: subject,
+          from_name: company,
+          company: company,
+          contact_name: name || '(not provided)',
+          email: email,
+          phone: phone,
+          preferred_contact: pref,
+          request_type: isOrder ? 'Order Request' : 'Quote Request',
+          message: plainText,
+          botcheck: false
+        })
+      });
+      const result = await resp.json().catch(()=>({success:false}));
+      sent = resp.ok && result && result.success;
+    }catch(err){
+      sent = false;
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+
+    if(sent){
+      showToast(isOrder ? 'Order request sent!' : 'Quote request sent!');
+      showContactSuccess();
+      state.quote = [];
+      saveQuote(); renderCounts(); renderDrawer(); renderButtons();
+    } else {
+      // Backend delivery failed — fall back to opening the customer's email app
+      const url = `mailto:Contact@kgmwholesale.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Opening your email app as backup…');
+      showContactFallback(plainText);
+    }
   });
+  document.getElementById('doneSuccessBtn').addEventListener('click', closeContactModal);
   document.getElementById('copyFallbackBtn').addEventListener('click', async ()=>{
     const text = document.getElementById('contactFallbackText').value;
     try{
