@@ -1024,6 +1024,30 @@ function showToast(msg){
 const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
 let contactIntent = 'quote';
 
+// ---------- Sales rep referral tracking ----------
+// A rep shares a link like kgmwholesale.com/?rep=nick. We capture it on landing,
+// remember it in this browser for future visits, and quietly attach it to every
+// quote/order/review/reseller submission so the right person gets credit.
+const KGM_REPS = { nick:'Nick', mario:'Mario', marvin:'Marvin', amad:'Amad' };
+function captureRepCode(){
+  try{
+    const params = new URLSearchParams(location.search);
+    const raw = (params.get('rep') || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if(raw){
+      localStorage.setItem('kgm-rep-code', raw);
+      localStorage.setItem('kgm-rep-captured-at', new Date().toISOString());
+    }
+  }catch(e){}
+}
+function getRepLabel(){
+  try{
+    const raw = localStorage.getItem('kgm-rep-code');
+    if(!raw) return '';
+    return KGM_REPS[raw] || (raw.charAt(0).toUpperCase() + raw.slice(1));
+  }catch(e){ return ''; }
+}
+captureRepCode();
+
 function openResellerModal(){
   document.getElementById('resellerFormError').textContent = '';
   document.getElementById('resellerForm').style.display = '';
@@ -1132,7 +1156,7 @@ function closeQuickView(){
   document.getElementById('quickViewOverlay').classList.remove('open');
   document.getElementById('quickViewModal').classList.remove('open');
 }
-function buildContactText({company,name,email,phone,pref,referral,isOrder}){
+function buildContactText({company,name,email,phone,pref,referral,isOrder,repLabel}){
   const itemLines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
   const intro = isOrder
     ? "Hi KGM Wholesale,\n\nI'd like to place an order for the following:"
@@ -1143,7 +1167,8 @@ function buildContactText({company,name,email,phone,pref,referral,isOrder}){
     `Email: ${email}`,
     `Phone: ${phone}`,
     `Preferred Contact Method: ${pref}`,
-    referral ? `Referred By: ${referral}` : null
+    referral ? `Referred By: ${referral}` : null,
+    repLabel ? `Sales Rep Link: ${repLabel}` : null
   ].filter(Boolean);
   const note = isOrder
     ? "Note: Case counts above are requested quantities. Final pricing and stock availability will be confirmed by our team before this order is processed."
@@ -1238,8 +1263,9 @@ function wireEvents(){
     }
     errEl.textContent = '';
 
-    const plainText = `New customer review from ${name}${business?' ('+business+')':''}:\n\n"${text}"\n\nOK to feature publicly: ${consent?'Yes':'No'}${email?`\nEmail: ${email}`:''}`;
-    const subject = `Customer Review — ${name}${business?' / '+business:''}`;
+    const repLabel = getRepLabel();
+    const plainText = `New customer review from ${name}${business?' ('+business+')':''}:\n\n"${text}"\n\nOK to feature publicly: ${consent?'Yes':'No'}${email?`\nEmail: ${email}`:''}${repLabel?`\nSales Rep Link: ${repLabel}`:''}`;
+    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}Customer Review — ${name}${business?' / '+business:''}`;
 
     const submitBtn = document.getElementById('submitReviewBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1259,6 +1285,7 @@ function wireEvents(){
           reviewer_business: business || '(not provided)',
           reviewer_email: email || '(not provided)',
           ok_to_feature: consent ? 'Yes' : 'No',
+          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: 'Customer Review',
           message: plainText,
           botcheck: false
@@ -1333,8 +1360,9 @@ function wireEvents(){
     }
     errEl.textContent = '';
 
-    const plainText = `New wholesale/reseller inquiry:\n\nBusiness: ${business}\nContact: ${name}\nEmail: ${email}\nPhone: ${phone}\n${message?`\nInterested in:\n${message}`:''}`;
-    const subject = `Reseller Inquiry — ${business}`;
+    const repLabel = getRepLabel();
+    const plainText = `New wholesale/reseller inquiry:\n\nBusiness: ${business}\nContact: ${name}\nEmail: ${email}\nPhone: ${phone}\n${message?`\nInterested in:\n${message}`:''}${repLabel?`\nSales Rep Link: ${repLabel}`:''}`;
+    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}Reseller Inquiry — ${business}`;
 
     const submitBtn = document.getElementById('submitResellerBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1355,6 +1383,7 @@ function wireEvents(){
           reseller_email: email,
           reseller_phone: phone,
           reseller_interest: message || '(not provided)',
+          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: 'Wholesale/Reseller Inquiry',
           message: plainText,
           botcheck: false
@@ -1419,8 +1448,9 @@ function wireEvents(){
     }catch(e){}
 
     const isOrder = contactIntent === 'order';
-    const plainText = buildContactText({company,name,email,phone,pref,referral,isOrder});
-    const subject = `${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
+    const repLabel = getRepLabel();
+    const plainText = buildContactText({company,name,email,phone,pref,referral,isOrder,repLabel});
+    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
 
     const submitBtn = document.getElementById('submitContactBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1442,6 +1472,7 @@ function wireEvents(){
           phone: phone,
           preferred_contact: pref,
           referred_by: referral || '(not provided)',
+          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: isOrder ? 'Order Request' : 'Quote Request',
           message: plainText,
           botcheck: false
