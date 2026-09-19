@@ -261,6 +261,16 @@ img{max-width:100%;display:block;}
 .tag:focus-visible{outline:2px solid var(--focus);outline-offset:1px;}
 .tag.added{background:var(--red);color:#fff;border-color:var(--red);}
 .tag.added::before{content:"✓ ";}
+.spice-format-picker{display:flex;flex-direction:column;gap:8px;}
+.spice-format-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;
+  padding:11px 14px;border:1px solid var(--line);border-radius:9px;background:var(--paper-2);
+  color:var(--ink);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;
+}
+.spice-format-btn:hover{border-color:var(--red);}
+.spice-format-btn .check{font-size:.78rem;color:var(--ink-soft);font-weight:600;}
+.spice-format-btn.added{background:var(--red);color:#fff;border-color:var(--red);}
+.spice-format-btn.added .check{color:#fff;}
 
 /* ---------- Quote drawer ---------- */
 .fab{
@@ -739,6 +749,18 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
 </div>
 
 
+<div class="contact-modal-overlay" id="spiceFormatModalOverlay"></div>
+<div class="contact-modal" id="spiceFormatModal" role="dialog" aria-modal="true" aria-labelledby="spiceFormatModalTitle" style="max-width:420px;">
+  <div class="contact-modal-head">
+    <h2 id="spiceFormatModalTitle">Which format?</h2>
+    <button class="drawer-close" id="closeSpiceFormatModalBtn" aria-label="Close">✕</button>
+  </div>
+  <p class="contact-modal-sub">Pick the format(s) you're interested in for <b id="spiceFormatModalSpiceName"></b> — we'll follow up on availability and pricing.</p>
+  <div class="contact-modal-body" style="padding-bottom:18px;">
+    <div class="spice-format-picker" id="spiceFormatPicker"></div>
+  </div>
+</div>
+
 <div class="contact-modal-overlay" id="resellerModalOverlay"></div>
 <div class="contact-modal" id="resellerModal" role="dialog" aria-modal="true" aria-labelledby="resellerModalTitle">
   <div class="contact-modal-head">
@@ -823,8 +845,9 @@ function renderButtons(){
     btn.textContent = on ? 'Added' : 'Add to Checkout';
   });
   document.querySelectorAll('.tag[data-spice]').forEach(btn=>{
-    const name = `${btn.dataset.spice} (Spice/Seasoning)`;
-    btn.classList.toggle('added', isInQuote('', name));
+    const spice = btn.dataset.spice;
+    const anyAdded = SPICE_FORMATS.some(f=>isInQuote('', spiceItemName(spice,f)));
+    btn.classList.toggle('added', anyAdded);
   });
 }
 
@@ -969,6 +992,28 @@ function showToast(msg){
 
 const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
 let contactIntent = 'quote';
+
+const SPICE_FORMATS = ['Consumer Jar','Food Service Jar','5lb Bag','10lb Bag','Bulk'];
+function spiceItemName(spice, format){ return `${spice} — ${format} (Spice/Seasoning)`; }
+let currentSpiceForModal = '';
+function renderSpiceFormatPicker(){
+  const wrap = document.getElementById('spiceFormatPicker');
+  wrap.innerHTML = SPICE_FORMATS.map(f=>{
+    const on = isInQuote('', spiceItemName(currentSpiceForModal, f));
+    return `<button type="button" class="spice-format-btn ${on?'added':''}" data-format="${esc(f)}">${esc(f)}<span class="check">${on?'✓ Added':'Add'}</span></button>`;
+  }).join('');
+}
+function openSpiceFormatModal(spiceName){
+  currentSpiceForModal = spiceName;
+  document.getElementById('spiceFormatModalSpiceName').textContent = spiceName;
+  renderSpiceFormatPicker();
+  document.getElementById('spiceFormatModalOverlay').classList.add('open');
+  document.getElementById('spiceFormatModal').classList.add('open');
+}
+function closeSpiceFormatModal(){
+  document.getElementById('spiceFormatModalOverlay').classList.remove('open');
+  document.getElementById('spiceFormatModal').classList.remove('open');
+}
 
 function openResellerModal(){
   document.getElementById('resellerFormError').textContent = '';
@@ -1414,12 +1459,21 @@ function wireEvents(){
     }
     const tagBtn = e.target.closest('.tag[data-spice]');
     if(tagBtn){
-      const spiceName = tagBtn.dataset.spice;
-      const item = { name: `${spiceName} (Spice/Seasoning)`, sku: '', pack: 'Ask for available formats & pricing', img: '' };
-      const wasAdded = isInQuote('', item.name);
-      toggleQuote(item);
-      showToast(wasAdded ? `Removed ${spiceName} from your checkout list` : `Added ${spiceName} — we'll follow up on formats & pricing`);
+      openSpiceFormatModal(tagBtn.dataset.spice);
     }
+  });
+
+  document.getElementById('closeSpiceFormatModalBtn').addEventListener('click', closeSpiceFormatModal);
+  document.getElementById('spiceFormatModalOverlay').addEventListener('click', closeSpiceFormatModal);
+  document.getElementById('spiceFormatPicker').addEventListener('click', e=>{
+    const btn = e.target.closest('.spice-format-btn');
+    if(!btn) return;
+    const format = btn.dataset.format;
+    const item = { name: spiceItemName(currentSpiceForModal, format), sku: '', pack: `Ask for pricing — ${format}`, img: '' };
+    const wasAdded = isInQuote('', item.name);
+    toggleQuote(item);
+    renderSpiceFormatPicker();
+    showToast(wasAdded ? `Removed ${currentSpiceForModal} (${format})` : `Added ${currentSpiceForModal} — ${format}`);
   });
 
   const search = document.getElementById('searchInput');
@@ -1454,6 +1508,7 @@ function wireEvents(){
   document.addEventListener('keydown', e=>{
     if(e.key !== 'Escape') return;
     if(document.getElementById('quickViewModal').classList.contains('open')) closeQuickView();
+    else if(document.getElementById('spiceFormatModal').classList.contains('open')) closeSpiceFormatModal();
     else if(document.getElementById('resellerModal').classList.contains('open')) closeResellerModal();
     else if(document.getElementById('contactModal').classList.contains('open')) closeContactModal();
     else if(document.getElementById('drawer').classList.contains('open')) openDrawer(false);
