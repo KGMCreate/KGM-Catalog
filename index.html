@@ -465,7 +465,7 @@ img{max-width:100%;display:block;}
 .qvr-item .qvr-name{display:block;font-size:.7rem;line-height:1.25;margin-top:5px;color:var(--ink);max-height:2.5em;overflow:hidden;}
 
 /* ---------- Footer ---------- */
-footer{background:var(--ink);color:var(--paper);padding-block:34px;}
+footer{background:var(--ink);color:var(--paper);padding-block:34px;padding-bottom:calc(34px + 70px + env(safe-area-inset-bottom,0px));}
 footer .wrap{display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between;}
 footer .col b{display:block;font-family:"Oswald";letter-spacing:.04em;margin-bottom:8px;color:var(--gold);font-size:.85rem;}
 footer .col{font-size:.85rem;color:#cfc6b3;line-height:1.7;}
@@ -572,7 +572,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   #cat-16 .tag{font-size:.72rem;padding:3px 0;}
 
   /* Footer / back cover: white with a bold red rule, not a solid ink block */
-  footer{background:#fff !important;color:var(--ink) !important;border-top:6px solid var(--red);break-inside:avoid-page;page-break-before:always;}
+  footer{background:#fff !important;color:var(--ink) !important;border-top:6px solid var(--red);break-inside:avoid-page;page-break-before:always;padding-bottom:34px !important;}
   footer .col{color:var(--ink-soft) !important;}
   footer .col b{color:var(--red) !important;}
   footer .bottom{color:var(--ink-soft) !important;border-top-color:var(--line) !important;}
@@ -747,7 +747,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
   <div class="bottom" style="flex-direction:column;align-items:flex-start;gap:4px;">
     <span>© 2026 KGM Wholesale. All items are stocked on a while-supplies-last basis; pricing, quantities &amp; availability are subject to change and confirmed at order time.</span>
-    <span>Local delivery is complimentary on orders of $400+. Orders under $400 may include a $25 delivery fee, applied at our discretion.</span>
+    <span>Delivery availability and any applicable fees depend on order size and location — just ask when you reach out.</span>
     <span>Catalog last updated 9/16/2026</span>
   </div>
 </footer>
@@ -762,7 +762,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <button class="drawer-close" id="closeDrawerBtn" aria-label="Close">✕</button>
   </div>
   <div class="drawer-list" id="drawerList"></div>
-  <div class="drawer-note">Case counts below are requests. All pricing and availability are confirmed by our team before your order is finalized — products are stocked on a while-supplies-last basis and quantities may vary. Local delivery is free on orders of $400 or more; orders under $400 may include a $25 delivery fee at our discretion.</div>
+  <div class="drawer-note">Case counts below are requests. All pricing and availability are confirmed by our team before your order is finalized — products are stocked on a while-supplies-last basis and quantities may vary. Delivery availability and any applicable fees depend on order size and location — just ask.</div>
   <div class="drawer-foot">
     <button class="btn btn-primary" id="openQuoteFormBtn">Request a Quote</button>
     <button class="btn" style="border:1px solid var(--line);background:var(--card);" id="openOrderFormBtn">Place an Order</button>
