@@ -1036,6 +1036,10 @@ function captureRepCode(){
     if(raw){
       localStorage.setItem('kgm-rep-code', raw);
       localStorage.setItem('kgm-rep-captured-at', new Date().toISOString());
+      const label = KGM_REPS[raw] || (raw.charAt(0).toUpperCase() + raw.slice(1));
+      // Visible confirmation so it's obvious the link worked — otherwise the page
+      // looks identical whether or not a rep code was picked up.
+      setTimeout(()=>{ try{ showToast(`You're connected with ${label} at KGM Wholesale`); }catch(e){} }, 400);
     }
   }catch(e){}
 }
