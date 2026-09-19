@@ -180,20 +180,6 @@ img{max-width:100%;display:block;}
 .about-section p.lede:last-child{margin-bottom:0;}
 .about-section p.lede b{color:var(--red);}
 
-/* ---------- Testimonials section ---------- */
-.testimonials{background:var(--paper-2);border-bottom:1px solid var(--line);}
-.testimonials .wrap{padding-block:44px;}
-.testimonials h2{font-size:1.5rem;margin:0 0 8px;}
-.testimonials .section-blurb{color:var(--ink-soft);font-size:.92rem;max-width:62ch;margin:0 0 26px;}
-.testimonial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
-.testimonial-card{
-  border:1.5px dashed var(--line);border-radius:12px;padding:22px 20px;background:var(--card);
-  display:flex;flex-direction:column;gap:8px;min-height:120px;justify-content:center;align-items:flex-start;
-}
-.testimonial-card .quote-mark{font-family:"Oswald";font-size:2.2rem;color:var(--gold);line-height:1;opacity:.55;}
-.testimonial-card .ph-text{color:var(--ink-soft);font-size:.86rem;font-style:italic;margin:0;}
-.testimonials .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
-.testimonials .btn-ghost:hover{border-color:var(--ink-soft);background:var(--card);}
 
 /* ---------- Business Accounts section ---------- */
 .biz-accounts{background:var(--card);border-bottom:1px solid var(--line);}
@@ -432,7 +418,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
   html, body{background:#fff !important;}
 
-  .searchbox, .quote-btn, .chipnav-outer, .fab, .back-to-top, .drawer, .drawer-overlay, .toast, .hero-ctas, .addbtn, .tagcloud-toggle, .no-results, .screen-only, .contact-modal-overlay, .contact-modal, .quickview-overlay, .quickview-modal, .card .zoom-badge, .testimonials, .biz-accounts, #reviewModalOverlay, #reviewModal, #resellerModalOverlay, #resellerModal{
+  .searchbox, .quote-btn, .chipnav-outer, .fab, .back-to-top, .drawer, .drawer-overlay, .toast, .hero-ctas, .addbtn, .tagcloud-toggle, .no-results, .screen-only, .contact-modal-overlay, .contact-modal, .quickview-overlay, .quickview-modal, .card .zoom-badge, .biz-accounts, #resellerModalOverlay, #resellerModal{
     display:none !important;
   }
   .print-only{display:block !important;}
@@ -577,19 +563,6 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <p class="eyebrow">Family-Owned &middot; Detroit-Born</p>
     <h2>Why KGM Wholesale</h2>
     <p class="lede"><b>Reliable. Consistent. Easy to work with.</b> That's the whole pitch. We're a family-owned, Detroit-born supplier who shows up when we say we will and fixes it fast when we don't — less hassle for you, more time for what actually matters.</p>
-  </div>
-</div>
-
-<div class="testimonials" id="testimonials">
-  <div class="wrap">
-    <h2>What Our Customers Say</h2>
-    <p class="section-blurb">We're just getting started collecting reviews from the businesses we work with. Check back soon — or if you're a KGM customer, we'd love to hear from you.</p>
-    <div class="testimonial-grid">
-      <div class="testimonial-card"><span class="quote-mark">&ldquo;</span><p class="ph-text">Customer testimonial coming soon.</p></div>
-      <div class="testimonial-card"><span class="quote-mark">&ldquo;</span><p class="ph-text">Customer testimonial coming soon.</p></div>
-      <div class="testimonial-card"><span class="quote-mark">&ldquo;</span><p class="ph-text">Customer testimonial coming soon.</p></div>
-    </div>
-    <button type="button" class="btn btn-ghost" id="openReviewModalBtn" style="margin-top:22px;">Share Your Experience</button>
   </div>
 </div>
 
@@ -758,59 +731,6 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
 </div>
 
-<div class="contact-modal-overlay" id="reviewModalOverlay"></div>
-<div class="contact-modal" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
-  <div class="contact-modal-head">
-    <h2 id="reviewModalTitle">Share Your Experience</h2>
-    <button class="drawer-close" id="closeReviewModalBtn" aria-label="Close">✕</button>
-  </div>
-  <p class="contact-modal-sub">Tell us about your experience with KGM Wholesale — we read every one, and may feature yours on our site.</p>
-  <form id="reviewForm">
-    <input type="text" name="hp_field" id="reviewHpField" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
-    <div class="contact-modal-body">
-      <div class="field">
-        <label for="reviewName">Your Name *</label>
-        <input type="text" id="reviewName" placeholder="Your name">
-      </div>
-      <div class="field">
-        <label for="reviewBusiness">Business Name <span style="font-weight:400;opacity:.65;">(optional)</span></label>
-        <input type="text" id="reviewBusiness" placeholder="Your company name">
-      </div>
-      <div class="field">
-        <label for="reviewEmail">Email <span style="font-weight:400;opacity:.65;">(optional, in case we follow up)</span></label>
-        <input type="email" id="reviewEmail" placeholder="you@company.com">
-      </div>
-      <div class="field">
-        <label for="reviewText">Your Review *</label>
-        <textarea id="reviewText" rows="5" placeholder="What's it been like working with KGM Wholesale?"></textarea>
-      </div>
-      <div class="field">
-        <label class="field-checkbox">
-          <input type="checkbox" id="reviewConsent" checked>
-          <span>It's okay to feature this review (with my name) on the KGM Wholesale website</span>
-        </label>
-      </div>
-    </div>
-    <div class="field-error" id="reviewFormError"></div>
-    <div class="drawer-foot">
-      <button type="submit" class="btn btn-primary" id="submitReviewBtn">Send Review</button>
-    </div>
-  </form>
-  <div class="contact-fallback" id="reviewSuccess">
-    <p class="contact-modal-sub" style="padding:0 0 4px;">✅ Thank you! We've received your review and really appreciate you taking the time.</p>
-    <div class="drawer-foot">
-      <button type="button" class="btn btn-primary" id="doneReviewSuccessBtn" style="flex:1;">Done</button>
-    </div>
-  </div>
-  <div class="contact-fallback" id="reviewFallback">
-    <p class="contact-modal-sub" style="padding:0 0 4px;">We couldn't reach our server just now. Your email app should be opening as a backup — if it didn't, copy the message below and send it to <b>Contact@kgmwholesale.com</b>.</p>
-    <textarea id="reviewFallbackText" class="fallback-textarea" readonly rows="8"></textarea>
-    <div class="drawer-foot" style="display:flex;gap:10px;">
-      <button type="button" class="btn btn-ghost" id="copyReviewFallbackBtn" style="flex:1;">Copy Message</button>
-      <button type="button" class="btn btn-primary" id="doneReviewFallbackBtn" style="flex:1;">Done</button>
-    </div>
-  </div>
-</div>
 
 <div class="contact-modal-overlay" id="resellerModalOverlay"></div>
 <div class="contact-modal" id="resellerModal" role="dialog" aria-modal="true" aria-labelledby="resellerModalTitle">
@@ -1060,31 +980,6 @@ function showResellerFallback(plainText){
   document.getElementById('resellerFallback').classList.add('show');
 }
 
-function openReviewModal(){
-  document.getElementById('reviewFormError').textContent = '';
-  document.getElementById('reviewForm').style.display = '';
-  document.getElementById('reviewFallback').classList.remove('show');
-  document.getElementById('reviewSuccess').classList.remove('show');
-  document.getElementById('reviewModalOverlay').classList.add('open');
-  document.getElementById('reviewModal').classList.add('open');
-}
-function closeReviewModal(){
-  document.getElementById('reviewModalOverlay').classList.remove('open');
-  document.getElementById('reviewModal').classList.remove('open');
-}
-function showReviewSuccess(){
-  document.getElementById('reviewForm').style.display = 'none';
-  document.getElementById('reviewFallback').classList.remove('show');
-  document.getElementById('reviewSuccess').classList.add('show');
-}
-function showReviewFallback(plainText){
-  const ta = document.getElementById('reviewFallbackText');
-  ta.value = plainText;
-  document.getElementById('reviewForm').style.display = 'none';
-  document.getElementById('reviewSuccess').classList.remove('show');
-  document.getElementById('reviewFallback').classList.add('show');
-}
-
 function openContactModal(intent){
   if(state.quote.length===0){ showToast('Add some items first'); return; }
   contactIntent = intent;
@@ -1206,101 +1101,6 @@ function wireEvents(){
   document.getElementById('openOrderFormBtn').addEventListener('click', ()=>openContactModal('order'));
   document.getElementById('closeContactModalBtn').addEventListener('click', closeContactModal);
   document.getElementById('contactModalOverlay').addEventListener('click', closeContactModal);
-
-  document.getElementById('openReviewModalBtn').addEventListener('click', openReviewModal);
-  document.getElementById('closeReviewModalBtn').addEventListener('click', closeReviewModal);
-  document.getElementById('reviewModalOverlay').addEventListener('click', closeReviewModal);
-  document.getElementById('doneReviewSuccessBtn').addEventListener('click', closeReviewModal);
-  document.getElementById('doneReviewFallbackBtn').addEventListener('click', closeReviewModal);
-  document.getElementById('copyReviewFallbackBtn').addEventListener('click', async ()=>{
-    const text = document.getElementById('reviewFallbackText').value;
-    try{
-      await navigator.clipboard.writeText(text);
-      showToast('Copied to clipboard');
-    }catch(e){
-      try{
-        const ta = document.getElementById('reviewFallbackText');
-        ta.select();
-        document.execCommand('copy');
-        showToast('Copied to clipboard');
-      }catch(e2){ showToast('Could not copy — select the text manually'); }
-    }
-  });
-
-  document.getElementById('reviewForm').addEventListener('submit', async e=>{
-    e.preventDefault();
-    if(document.getElementById('reviewHpField').value){
-      showToast('Review sent!');
-      showReviewSuccess();
-      return;
-    }
-    const name = document.getElementById('reviewName').value.trim();
-    const business = document.getElementById('reviewBusiness').value.trim();
-    const email = document.getElementById('reviewEmail').value.trim();
-    const text = document.getElementById('reviewText').value.trim();
-    const consent = document.getElementById('reviewConsent').checked;
-    const errEl = document.getElementById('reviewFormError');
-
-    if(!name || !text){
-      errEl.textContent = 'Please add your name and a review.';
-      return;
-    }
-    if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      errEl.textContent = 'Please enter a valid email address, or leave it blank.';
-      return;
-    }
-    errEl.textContent = '';
-
-    const plainText = `New customer review from ${name}${business?' ('+business+')':''}:\n\n"${text}"\n\nOK to feature publicly: ${consent?'Yes':'No'}${email?`\nEmail: ${email}`:''}`;
-    const subject = `Customer Review — ${name}${business?' / '+business:''}`;
-
-    const submitBtn = document.getElementById('submitReviewBtn');
-    const originalBtnText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
-
-    let sent = false;
-    try{
-      const resp = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: subject,
-          from_name: name,
-          reviewer_name: name,
-          reviewer_business: business || '(not provided)',
-          reviewer_email: email || '(not provided)',
-          ok_to_feature: consent ? 'Yes' : 'No',
-          request_type: 'Customer Review',
-          message: plainText,
-          botcheck: false
-        })
-      });
-      const result = await resp.json().catch(()=>({success:false}));
-      sent = resp.ok && result && result.success;
-    }catch(err){
-      sent = false;
-    }
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = originalBtnText;
-
-    if(sent){
-      showToast('Review sent — thank you!');
-      showReviewSuccess();
-    } else {
-      const url = `mailto:Contact@kgmwholesale.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
-      const a = document.createElement('a');
-      a.href = url;
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      showToast('Opening your email app as backup…');
-      showReviewFallback(plainText);
-    }
-  });
 
   document.getElementById('openResellerModalBtn').addEventListener('click', openResellerModal);
   document.getElementById('closeResellerModalBtn').addEventListener('click', closeResellerModal);
@@ -1627,7 +1427,6 @@ function wireEvents(){
   document.addEventListener('keydown', e=>{
     if(e.key !== 'Escape') return;
     if(document.getElementById('quickViewModal').classList.contains('open')) closeQuickView();
-    else if(document.getElementById('reviewModal').classList.contains('open')) closeReviewModal();
     else if(document.getElementById('resellerModal').classList.contains('open')) closeResellerModal();
     else if(document.getElementById('contactModal').classList.contains('open')) closeContactModal();
     else if(document.getElementById('drawer').classList.contains('open')) openDrawer(false);
