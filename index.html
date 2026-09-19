@@ -147,6 +147,21 @@ img{max-width:100%;display:block;}
 .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(10,8,6,.55) 0%, rgba(10,8,6,.82) 65%, rgba(10,8,6,.96) 100%);}
 .hero .wrap{position:relative;z-index:1;padding-block:52px 34px;color:#fdf9f0;}
+.hero-flex{display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap;}
+.hero-main{flex:1 1 480px;min-width:0;}
+.hero-showcase{
+  flex:0 0 210px;background:rgba(20,16,12,.5);border:1px solid rgba(255,255,255,.16);border-radius:14px;
+  padding:14px;margin-top:4px;
+}
+.hs-label{font-family:"IBM Plex Mono";font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.hs-frame{aspect-ratio:1;background:#fff;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hs-frame img{width:100%;height:100%;object-fit:contain;padding:14px;box-sizing:border-box;transition:opacity .3s ease;}
+.hs-frame img.fade{opacity:0;}
+.hs-name{font-family:"Source Sans 3";font-weight:600;font-size:.84rem;color:#fff;margin-top:10px;line-height:1.3;}
+.hs-cat{font-size:.7rem;color:#cfc6b3;margin-top:2px;}
+@media (max-width: 820px){
+  .hero-showcase{display:none;}
+}
 .eyebrow{color:var(--gold);font-family:"IBM Plex Mono";font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px;}
 .hero h1{font-size:clamp(2.1rem,5.5vw,3.4rem);margin:0 0 12px;line-height:1.02;color:#fff;}
 .hero h1 span{color:var(--red);}
@@ -170,6 +185,15 @@ img{max-width:100%;display:block;}
 .stat:last-child{border-right:none;}
 .stat .n{font-family:"Oswald";font-size:1.5rem;color:var(--red);display:block;}
 .stat .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);}
+
+/* ---------- Spice Spotlight banner ---------- */
+.spice-spotlight{background:var(--red);border-bottom:1px solid var(--line);}
+.spice-spotlight .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:26px;flex-wrap:wrap;}
+.spice-spotlight .eyebrow{color:#fff;opacity:.85;}
+.spice-spotlight h2{color:#fff;font-size:1.4rem;margin:0 0 6px;}
+.spice-spotlight p:not(.eyebrow){color:#fde9e9;font-size:.9rem;max-width:56ch;margin:0;}
+.spice-spotlight .btn-primary{background:#fff;color:var(--red);flex:0 0 auto;}
+.spice-spotlight .btn-primary:hover{background:#fde9e9;}
 
 /* ---------- About / Story section ---------- */
 .about-section{background:var(--card);border-bottom:1px solid var(--line);}
@@ -195,14 +219,26 @@ img{max-width:100%;display:block;}
 .biz-card .btn-ghost:hover{border-color:var(--ink-soft);background:var(--card);}
 
 /* ---------- Category sections ---------- */
-.cat{padding-block:38px;border-bottom:1px solid var(--line);scroll-margin-top:120px;}
+.cat{padding-block:22px;border-bottom:1px solid var(--line);scroll-margin-top:120px;}
 .cat:nth-child(even){background:var(--paper-2);}
-.cat-head{display:flex;gap:14px;align-items:center;margin-bottom:10px;padding-bottom:12px;border-bottom:3px solid var(--red);}
+.cat-head{
+  display:flex;gap:14px;align-items:center;padding-bottom:12px;border-bottom:3px solid var(--red);
+  cursor:pointer;user-select:none;
+}
+.cat-head:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
 .cat-num{
   font-family:"Oswald";font-size:1.05rem;color:#fff;background:var(--red);flex:0 0 auto;
   width:2.15rem;height:2.15rem;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
 }
-.cat-name{font-size:1.55rem;margin:0;}
+.cat-name{font-size:1.55rem;margin:0;flex:1;}
+.cat-count{font-size:.78rem;color:var(--ink-soft);font-weight:600;white-space:nowrap;}
+.cat-chevron{
+  flex:0 0 auto;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--red);transition:transform .18s ease;
+}
+.cat.open .cat-chevron{transform:rotate(180deg);}
+.cat-body{display:none;padding-top:22px;}
+.cat.open .cat-body{display:block;}
 .cat-blurb{color:var(--ink-soft);max-width:70ch;margin:6px 0 22px;font-size:.95rem;}
 .sub-label{font-family:"Oswald";font-size:.85rem;letter-spacing:.08em;color:var(--steel);margin:22px 0 12px;padding-top:14px;border-top:1px dashed var(--line);}
 .sub-label:first-of-type{border-top:none;padding-top:0;}
@@ -468,6 +504,9 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   .cat, .cat:nth-child(even){background:#fff !important;}
   .cat{padding-block:20px;page-break-before:always;}
   .cat-head, .cat-blurb, .sub-label{break-inside:avoid;break-after:avoid;}
+  .cat-body{display:block !important;}
+  .cat-chevron, .cat-count{display:none !important;}
+  .cat-head{cursor:default !important;}
 
   .card{box-shadow:none !important;break-inside:avoid;}
   .grid{grid-template-columns:repeat(4,1fr);gap:12px;}
@@ -529,39 +568,47 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
 
 <div class="hero">
   <img class="bg" src="hero.jpg" alt="">
-  <div class="wrap">
-    <img class="hero-logo print-only" src="logo.png" alt="KGM Wholesale logo">
-    <p class="eyebrow">Est. 2020 &middot; Detroit, Michigan</p>
-    <h1>From Spices <span>to Supplies</span> — your wholesale solution.</h1>
-    <p class="sub">226 foodservice, packaging &amp; janitorial products across 18 categories, plus our own Nice&nbsp;&amp;&nbsp;Tasty spice line — stocked and ready to ship.</p>
-    <div class="hero-ctas">
-      <a href="#contact" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Request a Quote
-      </a>
-      <a href="#cat-1" class="btn btn-ghost">Browse the Catalog ↓</a>
-      <button type="button" class="btn btn-ghost" id="printCatalogBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print / Save as PDF
-      </button>
+  <div class="wrap hero-flex">
+    <div class="hero-main">
+      <img class="hero-logo print-only" src="logo.png" alt="KGM Wholesale logo">
+      <p class="eyebrow">Est. 2020 &middot; Detroit, Michigan</p>
+      <h1>From Spices <span>to Supplies</span> — your wholesale solution.</h1>
+      <p class="sub">226 foodservice, packaging &amp; janitorial products across 18 categories, plus our own Nice&nbsp;&amp;&nbsp;Tasty spice line — stocked and ready to ship.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Request a Quote
+        </a>
+        <a href="#cat-1" class="btn btn-ghost" id="browseCatalogBtn">Browse the Catalog ↓</a>
+        <button type="button" class="btn btn-ghost" id="printCatalogBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / Save as PDF
+        </button>
+      </div>
+      <div class="contact-strip">
+        <div class="item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div><b>1-586-980-9376</b>Marvin — direct</div>
+        </div>
+        <div class="item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div><b>313-826-0567</b>Office</div>
+        </div>
+        <div class="item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          <div><b>Contact@kgmwholesale.com</b>Sales &amp; quotes</div>
+        </div>
+        <div class="item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>736 W 7 Mile</b>Detroit, MI 48203</div>
+        </div>
+      </div>
     </div>
-    <div class="contact-strip">
-      <div class="item">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        <div><b>1-586-980-9376</b>Marvin — direct</div>
-      </div>
-      <div class="item">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        <div><b>313-826-0567</b>Office</div>
-      </div>
-      <div class="item">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
-        <div><b>Contact@kgmwholesale.com</b>Sales &amp; quotes</div>
-      </div>
-      <div class="item">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <div><b>736 W 7 Mile</b>Detroit, MI 48203</div>
-      </div>
+    <div class="hero-showcase screen-only" id="heroShowcase" aria-hidden="true">
+      <div class="hs-label">From our catalog</div>
+      <div class="hs-frame"><img id="hsImg" src="" alt="" loading="lazy"></div>
+      <div class="hs-name" id="hsName"></div>
+      <div class="hs-cat" id="hsCat"></div>
     </div>
   </div>
 </div>
@@ -572,6 +619,17 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
     <div class="stat"><span class="n">226+</span><span class="l">Stocked SKUs</span></div>
     <div class="stat"><span class="n">139</span><span class="l">Spices &amp; Seasonings</span></div>
     <div class="stat"><span class="n">2020</span><span class="l">Est. in Detroit</span></div>
+  </div>
+</div>
+
+<div class="spice-spotlight screen-only">
+  <div class="wrap">
+    <div class="ss-text">
+      <p class="eyebrow">139 Spices &amp; Seasonings</p>
+      <h2>Our Full Spice Line — We Have It All</h2>
+      <p>Consumer jars, food service jars, 5lb &amp; 10lb bags, or bulk. Browse the full list, tell us what you're looking for, and we'll follow up on formats &amp; pricing.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="spiceSpotlightBtn">Browse Our Full Spice Line →</button>
   </div>
 </div>
 
@@ -851,7 +909,65 @@ function renderButtons(){
   });
 }
 
+function buildHeroShowcaseItems(){
+  const pickCats = [1,3,5,7,9,11,13,16,18];
+  const items = [];
+  pickCats.forEach(num=>{
+    const cat = DATA.categories.find(c=>c.num===num);
+    if(!cat) return;
+    const section = cat.sections.find(s=>s.items && s.items.length);
+    if(section){
+      const it = section.items[0];
+      items.push({name: it.name, img: it.img, catName: cat.name});
+    }
+  });
+  return items;
+}
+function startHeroShowcase(){
+  const el = document.getElementById('heroShowcase');
+  if(!el) return;
+  const items = buildHeroShowcaseItems();
+  if(!items.length) return;
+  const img = document.getElementById('hsImg');
+  const nameEl = document.getElementById('hsName');
+  const catEl = document.getElementById('hsCat');
+  let idx = 0;
+  function paint(i){
+    img.src = items[i].img;
+    img.alt = items[i].name;
+    nameEl.textContent = items[i].name;
+    catEl.textContent = items[i].catName;
+  }
+  function advance(){
+    img.classList.add('fade');
+    setTimeout(()=>{
+      idx = (idx+1) % items.length;
+      paint(idx);
+      img.classList.remove('fade');
+    }, 280);
+  }
+  paint(idx);
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceMotion) setInterval(advance, 3200);
+}
+
 function catAnchor(num){ return 'cat-'+num; }
+function openSpiceTagCloud(){
+  const cloud = document.getElementById('spiceCloud');
+  const toggleBtn = document.getElementById('spiceToggle');
+  const hint = document.getElementById('spiceCloudHint');
+  if(!cloud || !toggleBtn) return;
+  cloud.classList.add('open');
+  toggleBtn.textContent = `Hide full spice & seasoning list (${DATA.raw_spices.length} items) ▴`;
+  if(hint) hint.style.display = '';
+}
+function toggleCategoryEl(catEl, forceOpen){
+  if(!catEl) return;
+  const willOpen = forceOpen !== undefined ? forceOpen : !catEl.classList.contains('open');
+  catEl.classList.toggle('open', willOpen);
+  const head = catEl.querySelector('.cat-head');
+  if(head) head.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
 
 function renderNav(){
   const nav = document.getElementById('chipNav');
@@ -887,6 +1003,9 @@ function productCard(it, catName){
   </div>`;
 }
 
+function catItemCount(cat){
+  return cat.sections.reduce((n,s)=>n+s.items.length, 0);
+}
 function renderCatalog(){
   const main = document.getElementById('catalog');
   main.innerHTML = DATA.categories.map(cat=>{
@@ -895,12 +1014,20 @@ function renderCatalog(){
       <div class="grid">${s.items.map(it=>productCard(it, cat.name)).join('')}</div>
     `).join('');
     const spiceExtra = cat.num===16 ? spiceBlock() : '';
+    const count = catItemCount(cat);
     return `<section class="cat" id="${catAnchor(cat.num)}">
       <div class="wrap">
-        <div class="cat-head"><span class="cat-num mono">${String(cat.num).padStart(2,'0')}</span><h2 class="cat-name">${cat.name}</h2></div>
-        ${cat.blurb ? `<p class="cat-blurb">${cat.blurb}</p>` : ''}
-        ${sections}
-        ${spiceExtra}
+        <div class="cat-head" role="button" tabindex="0" aria-expanded="false" aria-controls="${catAnchor(cat.num)}-body">
+          <span class="cat-num mono">${String(cat.num).padStart(2,'0')}</span>
+          <h2 class="cat-name">${cat.name}</h2>
+          <span class="cat-count">${count} item${count===1?'':'s'}</span>
+          <span class="cat-chevron" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </div>
+        <div class="cat-body" id="${catAnchor(cat.num)}-body">
+          ${cat.blurb ? `<p class="cat-blurb">${cat.blurb}</p>` : ''}
+          ${sections}
+          ${spiceExtra}
+        </div>
       </div>
     </section>`;
   }).join('');
@@ -1136,6 +1263,31 @@ function quotePlainText(){
 }
 
 function wireEvents(){
+  function jumpToCategory(id){
+    const catEl = document.getElementById(id);
+    if(!catEl) return;
+    toggleCategoryEl(catEl, true);
+    try{ history.replaceState(null, '', '#'+id); }catch(err){}
+    requestAnimationFrame(()=>catEl.scrollIntoView({behavior:'smooth', block:'start'}));
+  }
+  document.getElementById('chipNav').addEventListener('click', e=>{
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    e.preventDefault();
+    jumpToCategory(chip.getAttribute('href').slice(1));
+  });
+  document.getElementById('browseCatalogBtn').addEventListener('click', e=>{
+    e.preventDefault();
+    jumpToCategory('cat-1');
+  });
+  const spiceSpotlightBtn = document.getElementById('spiceSpotlightBtn');
+  if(spiceSpotlightBtn){
+    spiceSpotlightBtn.addEventListener('click', e=>{
+      e.preventDefault();
+      jumpToCategory('cat-16');
+      setTimeout(openSpiceTagCloud, 350);
+    });
+  }
   document.getElementById('themeToggle').addEventListener('click', ()=>{
     const next = effectiveTheme()==='dark' ? 'light' : 'dark';
     try{ localStorage.setItem('kgm-theme', next); }catch(e){}
@@ -1405,9 +1557,15 @@ function wireEvents(){
   document.getElementById('catalog').addEventListener('keydown', e=>{
     if(e.key !== 'Enter' && e.key !== ' ') return;
     const thumb = e.target.closest('.thumb');
-    if(!thumb) return;
-    e.preventDefault();
-    openQuickView(thumb.dataset);
+    if(thumb){ e.preventDefault(); openQuickView(thumb.dataset); return; }
+    const head = e.target.closest('.cat-head');
+    if(head){ e.preventDefault(); toggleCategoryEl(head.closest('.cat')); }
+  });
+  // Category accordion: click a category header to expand/collapse it.
+  document.getElementById('catalog').addEventListener('click', e=>{
+    const head = e.target.closest('.cat-head');
+    if(!head) return;
+    toggleCategoryEl(head.closest('.cat'));
   });
   document.getElementById('closeQuickViewBtn').addEventListener('click', closeQuickView);
   document.getElementById('quickViewOverlay').addEventListener('click', closeQuickView);
@@ -1497,6 +1655,9 @@ function wireEvents(){
         if(gridHasVisible) catHasVisible = true;
       });
       cat.style.display = (words.length && !catHasVisible) ? 'none' : '';
+      // While searching, auto-expand categories with matches so results are visible;
+      // clearing the search collapses everything back to the default accordion view.
+      toggleCategoryEl(cat, words.length ? catHasVisible : false);
       if(catHasVisible) anyVisible = true;
     });
     document.getElementById('noResults').classList.toggle('show', words.length>0 && !anyVisible);
@@ -1535,6 +1696,15 @@ renderCounts();
 renderButtons();
 renderDrawer();
 wireEvents();
+startHeroShowcase();
+// Deep-link support: if the page loaded with a #cat-N hash, open and scroll to that category.
+if(location.hash){
+  const targetCat = document.querySelector(location.hash);
+  if(targetCat && targetCat.classList.contains('cat')){
+    toggleCategoryEl(targetCat, true);
+    requestAnimationFrame(()=>targetCat.scrollIntoView({block:'start'}));
+  }
+}
 </script>
 </body>
 </html>
