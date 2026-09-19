@@ -195,6 +195,19 @@ img{max-width:100%;display:block;}
 .testimonials .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
 .testimonials .btn-ghost:hover{border-color:var(--ink-soft);background:var(--card);}
 
+/* ---------- Business Accounts section ---------- */
+.biz-accounts{background:var(--card);border-bottom:1px solid var(--line);}
+.biz-accounts .wrap{padding-block:44px;}
+.biz-accounts h2{font-size:1.5rem;margin:0 0 8px;}
+.biz-accounts .section-blurb{color:var(--ink-soft);font-size:.92rem;max-width:62ch;margin:0 0 26px;}
+.biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
+.biz-card{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:24px 22px;display:flex;flex-direction:column;gap:10px;}
+.biz-card h3{font-family:"Oswald";font-size:1.05rem;letter-spacing:.02em;color:var(--red);margin:0;}
+.biz-card p{font-size:.88rem;color:var(--ink-soft);line-height:1.55;margin:0 0 4px;}
+.biz-card .btn{align-self:flex-start;margin-top:auto;}
+.biz-card .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+.biz-card .btn-ghost:hover{border-color:var(--ink-soft);background:var(--card);}
+
 /* ---------- Category sections ---------- */
 .cat{padding-block:38px;border-bottom:1px solid var(--line);scroll-margin-top:120px;}
 .cat:nth-child(even){background:var(--paper-2);}
@@ -418,7 +431,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
   html, body{background:#fff !important;}
 
-  .searchbox, .quote-btn, .chipnav-outer, .fab, .back-to-top, .drawer, .drawer-overlay, .toast, .hero-ctas, .addbtn, .tagcloud-toggle, .no-results, .screen-only, .contact-modal-overlay, .contact-modal, .quickview-overlay, .quickview-modal, .card .zoom-badge, .testimonials, #reviewModalOverlay, #reviewModal{
+  .searchbox, .quote-btn, .chipnav-outer, .fab, .back-to-top, .drawer, .drawer-overlay, .toast, .hero-ctas, .addbtn, .tagcloud-toggle, .no-results, .screen-only, .contact-modal-overlay, .contact-modal, .quickview-overlay, .quickview-modal, .card .zoom-badge, .testimonials, .biz-accounts, #reviewModalOverlay, #reviewModal, #resellerModalOverlay, #resellerModal{
     display:none !important;
   }
   .print-only{display:block !important;}
@@ -562,8 +575,8 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   <div class="wrap">
     <p class="eyebrow">Family-Owned &middot; Detroit-Born</p>
     <h2>Why KGM Wholesale</h2>
-    <p class="lede">KGM Wholesale was founded in Detroit in 2020, built on a simple idea: local restaurants, caterers, and food service businesses deserve a supplier that actually picks up the phone. We're a <b>family-owned</b> distributor, not a call center — when you reach out for a quote or place an order, you're talking directly to the people who run this business, not working your way through a ticket queue.</p>
-    <p class="lede">From foodservice packaging and janitorial supplies to our own Nice &amp; Tasty spice line, everything we stock is chosen because it's what Detroit kitchens actually use every day. We believe technology should handle the paperwork so we can focus on what matters most — getting you what you need, when you need it, from people who know your business by name.</p>
+    <p class="lede">KGM Wholesale was founded in Detroit in 2020 on a simple idea: what separates a good supplier from a great one isn't price — it's whether they show up. We built this business on <b>consistency</b>: the right products, in stock, delivered when we said they would be. And when something doesn't go as planned, because in this business something eventually always does, we go the extra step to make it right instead of making it your problem.</p>
+    <p class="lede">We handle the sourcing, the inventory, the delivery logistics, and the reordering — the back-end work of running a kitchen's supply chain — so you can put that energy where it belongs: into the quality of your food. We're <b>family-owned</b>, Detroit-born, and we treat every account like a long-term relationship, not a transaction.</p>
   </div>
 </div>
 
@@ -577,6 +590,25 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
       <div class="testimonial-card"><span class="quote-mark">&ldquo;</span><p class="ph-text">Customer testimonial coming soon.</p></div>
     </div>
     <button type="button" class="btn btn-ghost" id="openReviewModalBtn" style="margin-top:22px;">Share Your Experience</button>
+  </div>
+</div>
+
+<div class="biz-accounts" id="business">
+  <div class="wrap">
+    <h2>Business Accounts</h2>
+    <p class="section-blurb">Two ways to grow with KGM beyond a one-off order.</p>
+    <div class="biz-grid">
+      <div class="biz-card">
+        <h3>Credit Accounts</h3>
+        <p>Qualifying businesses can apply for net payment terms so you're not paying up front on every order. Download the application, fill it out, sign it, and send it back to us — we'll follow up once it's been reviewed.</p>
+        <a class="btn btn-primary" href="kgm-credit-application.pdf" target="_blank" rel="noopener">Download Credit Application (PDF)</a>
+      </div>
+      <div class="biz-card">
+        <h3>Wholesale &amp; Reseller Accounts</h3>
+        <p>We also sell in bulk to other distributors. If you're looking to buy in volume, reach out and let us know what you need — we'll take it from there.</p>
+        <button type="button" class="btn btn-ghost" id="openResellerModalBtn">Start a Reseller Inquiry</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -769,6 +801,58 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
 </div>
 
+<div class="contact-modal-overlay" id="resellerModalOverlay"></div>
+<div class="contact-modal" id="resellerModal" role="dialog" aria-modal="true" aria-labelledby="resellerModalTitle">
+  <div class="contact-modal-head">
+    <h2 id="resellerModalTitle">Wholesale &amp; Reseller Inquiry</h2>
+    <button class="drawer-close" id="closeResellerModalBtn" aria-label="Close">✕</button>
+  </div>
+  <p class="contact-modal-sub">Tell us a bit about your business and what you're looking to buy in bulk — we'll follow up to talk pricing and volume.</p>
+  <form id="resellerForm">
+    <input type="text" name="hp_field" id="resellerHpField" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
+    <div class="contact-modal-body">
+      <div class="field">
+        <label for="resellerBusiness">Business Name *</label>
+        <input type="text" id="resellerBusiness" placeholder="Your company name">
+      </div>
+      <div class="field">
+        <label for="resellerName">Contact Name *</label>
+        <input type="text" id="resellerName" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="resellerEmail">Email *</label>
+        <input type="email" id="resellerEmail" placeholder="you@company.com">
+      </div>
+      <div class="field">
+        <label for="resellerPhone">Phone *</label>
+        <input type="tel" id="resellerPhone" placeholder="(313) 555-0100">
+      </div>
+      <div class="field">
+        <label for="resellerMessage">What are you looking to buy? <span style="font-weight:400;opacity:.65;">(optional)</span></label>
+        <textarea id="resellerMessage" rows="4" placeholder="Products, categories, or volume you're interested in"></textarea>
+      </div>
+    </div>
+    <div class="field-error" id="resellerFormError"></div>
+    <div class="drawer-foot">
+      <button type="submit" class="btn btn-primary" id="submitResellerBtn">Send Inquiry</button>
+    </div>
+  </form>
+  <div class="contact-fallback" id="resellerSuccess">
+    <p class="contact-modal-sub" style="padding:0 0 4px;">✅ Thanks! We've received your inquiry and will follow up shortly.</p>
+    <div class="drawer-foot">
+      <button type="button" class="btn btn-primary" id="doneResellerSuccessBtn" style="flex:1;">Done</button>
+    </div>
+  </div>
+  <div class="contact-fallback" id="resellerFallback">
+    <p class="contact-modal-sub" style="padding:0 0 4px;">We couldn't reach our server just now. Your email app should be opening as a backup — if it didn't, copy the message below and send it to <b>Contact@kgmwholesale.com</b>.</p>
+    <textarea id="resellerFallbackText" class="fallback-textarea" readonly rows="8"></textarea>
+    <div class="drawer-foot" style="display:flex;gap:10px;">
+      <button type="button" class="btn btn-ghost" id="copyResellerFallbackBtn" style="flex:1;">Copy Message</button>
+      <button type="button" class="btn btn-primary" id="doneResellerFallbackBtn" style="flex:1;">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -859,10 +943,13 @@ function renderCatalog(){
 
 function spiceBlock(){
   return `
+  <p class="cat-blurb" style="margin-top:-4px;">Our full line of ${DATA.raw_spices.length}+ spices and seasonings is available in multiple formats — availability depends on the specific spice, so ask us what's stocked for the item you need.</p>
   <div class="spice-formats">
     <div class="f"><b>Consumer Size Jars</b><span>Supermarket-style packaging, ideal for retail display and home use.</span></div>
-    <div class="f"><b>Bulk 5lb Bags</b><span>Built for restaurants and commercial kitchens needing larger quantities at maximum value.</span></div>
     <div class="f"><b>Food Service Jars</b><span>Heavy-duty containers for high-volume food service and institutional use.</span></div>
+    <div class="f"><b>5lb Bags</b><span>Standard bulk bags for restaurants and commercial kitchens.</span></div>
+    <div class="f"><b>10lb Bags</b><span>Larger bulk bags for high-volume kitchens and processors.</span></div>
+    <div class="f"><b>Bulk</b><span>Full bulk bag sizes for high-volume buyers and resellers — ask us about available bulk weights for your spice.</span></div>
   </div>
   <div class="tagcloud-wrap">
     <button class="tagcloud-toggle" id="spiceToggle">Show full spice &amp; seasoning list (${DATA.raw_spices.length} items) ▾</button>
@@ -936,6 +1023,31 @@ function showToast(msg){
 
 const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
 let contactIntent = 'quote';
+
+function openResellerModal(){
+  document.getElementById('resellerFormError').textContent = '';
+  document.getElementById('resellerForm').style.display = '';
+  document.getElementById('resellerFallback').classList.remove('show');
+  document.getElementById('resellerSuccess').classList.remove('show');
+  document.getElementById('resellerModalOverlay').classList.add('open');
+  document.getElementById('resellerModal').classList.add('open');
+}
+function closeResellerModal(){
+  document.getElementById('resellerModalOverlay').classList.remove('open');
+  document.getElementById('resellerModal').classList.remove('open');
+}
+function showResellerSuccess(){
+  document.getElementById('resellerForm').style.display = 'none';
+  document.getElementById('resellerFallback').classList.remove('show');
+  document.getElementById('resellerSuccess').classList.add('show');
+}
+function showResellerFallback(plainText){
+  const ta = document.getElementById('resellerFallbackText');
+  ta.value = plainText;
+  document.getElementById('resellerForm').style.display = 'none';
+  document.getElementById('resellerSuccess').classList.remove('show');
+  document.getElementById('resellerFallback').classList.add('show');
+}
 
 function openReviewModal(){
   document.getElementById('reviewFormError').textContent = '';
@@ -1177,6 +1289,102 @@ function wireEvents(){
     }
   });
 
+  document.getElementById('openResellerModalBtn').addEventListener('click', openResellerModal);
+  document.getElementById('closeResellerModalBtn').addEventListener('click', closeResellerModal);
+  document.getElementById('resellerModalOverlay').addEventListener('click', closeResellerModal);
+  document.getElementById('doneResellerSuccessBtn').addEventListener('click', closeResellerModal);
+  document.getElementById('doneResellerFallbackBtn').addEventListener('click', closeResellerModal);
+  document.getElementById('copyResellerFallbackBtn').addEventListener('click', async ()=>{
+    const text = document.getElementById('resellerFallbackText').value;
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('Copied to clipboard');
+    }catch(e){
+      try{
+        const ta = document.getElementById('resellerFallbackText');
+        ta.select();
+        document.execCommand('copy');
+        showToast('Copied to clipboard');
+      }catch(e2){ showToast('Could not copy — select the text manually'); }
+    }
+  });
+
+  document.getElementById('resellerForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    if(document.getElementById('resellerHpField').value){
+      showToast('Inquiry sent!');
+      showResellerSuccess();
+      return;
+    }
+    const business = document.getElementById('resellerBusiness').value.trim();
+    const name = document.getElementById('resellerName').value.trim();
+    const email = document.getElementById('resellerEmail').value.trim();
+    const phone = document.getElementById('resellerPhone').value.trim();
+    const message = document.getElementById('resellerMessage').value.trim();
+    const errEl = document.getElementById('resellerFormError');
+
+    if(!business || !name || !email || !phone){
+      errEl.textContent = 'Please fill in business name, contact name, email, and phone.';
+      return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      errEl.textContent = 'Please enter a valid email address.';
+      return;
+    }
+    errEl.textContent = '';
+
+    const plainText = `New wholesale/reseller inquiry:\n\nBusiness: ${business}\nContact: ${name}\nEmail: ${email}\nPhone: ${phone}\n${message?`\nInterested in:\n${message}`:''}`;
+    const subject = `Reseller Inquiry — ${business}`;
+
+    const submitBtn = document.getElementById('submitResellerBtn');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    let sent = false;
+    try{
+      const resp = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: subject,
+          from_name: business,
+          reseller_business: business,
+          reseller_contact: name,
+          reseller_email: email,
+          reseller_phone: phone,
+          reseller_interest: message || '(not provided)',
+          request_type: 'Wholesale/Reseller Inquiry',
+          message: plainText,
+          botcheck: false
+        })
+      });
+      const result = await resp.json().catch(()=>({success:false}));
+      sent = resp.ok && result && result.success;
+    }catch(err){
+      sent = false;
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+
+    if(sent){
+      showToast('Inquiry sent — thank you!');
+      showResellerSuccess();
+    } else {
+      const url = `mailto:Contact@kgmwholesale.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Opening your email app as backup…');
+      showResellerFallback(plainText);
+    }
+  });
+
   document.getElementById('contactForm').addEventListener('submit', async e=>{
     e.preventDefault();
     // Honeypot: real visitors never see or fill this field, so anything in it means a bot.
@@ -1401,6 +1609,7 @@ function wireEvents(){
     if(e.key !== 'Escape') return;
     if(document.getElementById('quickViewModal').classList.contains('open')) closeQuickView();
     else if(document.getElementById('reviewModal').classList.contains('open')) closeReviewModal();
+    else if(document.getElementById('resellerModal').classList.contains('open')) closeResellerModal();
     else if(document.getElementById('contactModal').classList.contains('open')) closeContactModal();
     else if(document.getElementById('drawer').classList.contains('open')) openDrawer(false);
   });
