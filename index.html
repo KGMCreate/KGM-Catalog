@@ -335,9 +335,10 @@ img{max-width:100%;display:block;}
 .contact-modal-body{padding:14px 20px 4px;display:flex;flex-direction:column;gap:13px;}
 .field{display:flex;flex-direction:column;gap:6px;}
 .field label{font-size:.78rem;font-weight:600;color:var(--ink);}
-.field input[type=text],.field input[type=email],.field input[type=tel]{
+.field input[type=text],.field input[type=email],.field input[type=tel],.field select{
   padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit;background:#fff;color:var(--ink);
 }
+.field select{appearance:auto;cursor:pointer;}
 .field textarea{
   padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;font-family:inherit;
   background:#fff;color:var(--ink);resize:vertical;line-height:1.5;
@@ -699,8 +700,19 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
         <input type="tel" id="custPhone" placeholder="(313) 555-0100">
       </div>
       <div class="field">
-        <label for="custReferral">Referred By <span style="font-weight:400;opacity:.65;">(optional)</span></label>
-        <input type="text" id="custReferral" placeholder="e.g. Nick, Mario, Marvin, a friend, or found us online">
+        <label for="custRepSelect">Which KGM rep helped you? <span style="font-weight:400;opacity:.65;">(optional)</span></label>
+        <select id="custRepSelect">
+          <option value="">Not sure / no one yet</option>
+          <option value="Nick">Nick</option>
+          <option value="Mario">Mario</option>
+          <option value="Marvin">Marvin</option>
+          <option value="Amad">Amad</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field" id="custRepOtherWrap" style="display:none;">
+        <label for="custRepOther">Who referred you?</label>
+        <input type="text" id="custRepOther" placeholder="Name of the person who referred you">
       </div>
       <div class="field">
         <label>How should we follow up? *</label>
@@ -1024,34 +1036,6 @@ function showToast(msg){
 const WEB3FORMS_ACCESS_KEY = '0d4d8993-30e5-4ff6-a470-6a4abc7bd4a8';
 let contactIntent = 'quote';
 
-// ---------- Sales rep referral tracking ----------
-// A rep shares a link like kgmwholesale.com/?rep=nick. We capture it on landing,
-// remember it in this browser for future visits, and quietly attach it to every
-// quote/order/review/reseller submission so the right person gets credit.
-const KGM_REPS = { nick:'Nick', mario:'Mario', marvin:'Marvin', amad:'Amad' };
-function captureRepCode(){
-  try{
-    const params = new URLSearchParams(location.search);
-    const raw = (params.get('rep') || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    if(raw){
-      localStorage.setItem('kgm-rep-code', raw);
-      localStorage.setItem('kgm-rep-captured-at', new Date().toISOString());
-      const label = KGM_REPS[raw] || (raw.charAt(0).toUpperCase() + raw.slice(1));
-      // Visible confirmation so it's obvious the link worked — otherwise the page
-      // looks identical whether or not a rep code was picked up.
-      setTimeout(()=>{ try{ showToast(`You're connected with ${label} at KGM Wholesale`); }catch(e){} }, 400);
-    }
-  }catch(e){}
-}
-function getRepLabel(){
-  try{
-    const raw = localStorage.getItem('kgm-rep-code');
-    if(!raw) return '';
-    return KGM_REPS[raw] || (raw.charAt(0).toUpperCase() + raw.slice(1));
-  }catch(e){ return ''; }
-}
-captureRepCode();
-
 function openResellerModal(){
   document.getElementById('resellerFormError').textContent = '';
   document.getElementById('resellerForm').style.display = '';
@@ -1117,7 +1101,9 @@ function openContactModal(intent){
     document.getElementById('custName').value = saved.name||'';
     document.getElementById('custEmail').value = saved.email||'';
     document.getElementById('custPhone').value = saved.phone||'';
-    document.getElementById('custReferral').value = saved.referral||'';
+    document.getElementById('custRepSelect').value = saved.repSelect||'';
+    document.getElementById('custRepOther').value = saved.repOther||'';
+    document.getElementById('custRepOtherWrap').style.display = saved.repSelect==='Other' ? '' : 'none';
     if(saved.pref==='Text'){
       const t = document.querySelector('input[name="contactPref"][value="Text"]');
       if(t) t.checked = true;
@@ -1160,7 +1146,7 @@ function closeQuickView(){
   document.getElementById('quickViewOverlay').classList.remove('open');
   document.getElementById('quickViewModal').classList.remove('open');
 }
-function buildContactText({company,name,email,phone,pref,referral,isOrder,repLabel}){
+function buildContactText({company,name,email,phone,pref,referral,isOrder}){
   const itemLines = state.quote.map(it=>`• ${it.name}${it.pack?' — '+it.pack:''}${it.sku?' (#'+it.sku+')':''} — Qty: ${it.cases||1} case(s)`);
   const intro = isOrder
     ? "Hi KGM Wholesale,\n\nI'd like to place an order for the following:"
@@ -1171,8 +1157,7 @@ function buildContactText({company,name,email,phone,pref,referral,isOrder,repLab
     `Email: ${email}`,
     `Phone: ${phone}`,
     `Preferred Contact Method: ${pref}`,
-    referral ? `Referred By: ${referral}` : null,
-    repLabel ? `Sales Rep Link: ${repLabel}` : null
+    referral ? `Referred By: ${referral}` : null
   ].filter(Boolean);
   const note = isOrder
     ? "Note: Case counts above are requested quantities. Final pricing and stock availability will be confirmed by our team before this order is processed."
@@ -1267,9 +1252,8 @@ function wireEvents(){
     }
     errEl.textContent = '';
 
-    const repLabel = getRepLabel();
-    const plainText = `New customer review from ${name}${business?' ('+business+')':''}:\n\n"${text}"\n\nOK to feature publicly: ${consent?'Yes':'No'}${email?`\nEmail: ${email}`:''}${repLabel?`\nSales Rep Link: ${repLabel}`:''}`;
-    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}Customer Review — ${name}${business?' / '+business:''}`;
+    const plainText = `New customer review from ${name}${business?' ('+business+')':''}:\n\n"${text}"\n\nOK to feature publicly: ${consent?'Yes':'No'}${email?`\nEmail: ${email}`:''}`;
+    const subject = `Customer Review — ${name}${business?' / '+business:''}`;
 
     const submitBtn = document.getElementById('submitReviewBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1289,7 +1273,6 @@ function wireEvents(){
           reviewer_business: business || '(not provided)',
           reviewer_email: email || '(not provided)',
           ok_to_feature: consent ? 'Yes' : 'No',
-          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: 'Customer Review',
           message: plainText,
           botcheck: false
@@ -1364,9 +1347,8 @@ function wireEvents(){
     }
     errEl.textContent = '';
 
-    const repLabel = getRepLabel();
-    const plainText = `New wholesale/reseller inquiry:\n\nBusiness: ${business}\nContact: ${name}\nEmail: ${email}\nPhone: ${phone}\n${message?`\nInterested in:\n${message}`:''}${repLabel?`\nSales Rep Link: ${repLabel}`:''}`;
-    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}Reseller Inquiry — ${business}`;
+    const plainText = `New wholesale/reseller inquiry:\n\nBusiness: ${business}\nContact: ${name}\nEmail: ${email}\nPhone: ${phone}\n${message?`\nInterested in:\n${message}`:''}`;
+    const subject = `Reseller Inquiry — ${business}`;
 
     const submitBtn = document.getElementById('submitResellerBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1387,7 +1369,6 @@ function wireEvents(){
           reseller_email: email,
           reseller_phone: phone,
           reseller_interest: message || '(not provided)',
-          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: 'Wholesale/Reseller Inquiry',
           message: plainText,
           botcheck: false
@@ -1418,6 +1399,10 @@ function wireEvents(){
     }
   });
 
+  document.getElementById('custRepSelect').addEventListener('change', e=>{
+    document.getElementById('custRepOtherWrap').style.display = e.target.value === 'Other' ? '' : 'none';
+  });
+
   document.getElementById('contactForm').addEventListener('submit', async e=>{
     e.preventDefault();
     // Honeypot: real visitors never see or fill this field, so anything in it means a bot.
@@ -1432,7 +1417,9 @@ function wireEvents(){
     const name = document.getElementById('custName').value.trim();
     const email = document.getElementById('custEmail').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
-    const referral = document.getElementById('custReferral').value.trim();
+    const repSelect = document.getElementById('custRepSelect').value;
+    const repOther = document.getElementById('custRepOther').value.trim();
+    const referral = repSelect === 'Other' ? (repOther || 'Other') : repSelect;
     const prefEl = document.querySelector('input[name="contactPref"]:checked');
     const pref = prefEl ? prefEl.value : 'Email';
     const errEl = document.getElementById('contactFormError');
@@ -1448,13 +1435,12 @@ function wireEvents(){
     errEl.textContent = '';
 
     try{
-      localStorage.setItem('kgm-customer-info', JSON.stringify({company,name,email,phone,pref,referral}));
+      localStorage.setItem('kgm-customer-info', JSON.stringify({company,name,email,phone,pref,repSelect,repOther}));
     }catch(e){}
 
     const isOrder = contactIntent === 'order';
-    const repLabel = getRepLabel();
-    const plainText = buildContactText({company,name,email,phone,pref,referral,isOrder,repLabel});
-    const subject = `${repLabel?`[Rep: ${repLabel}] `:''}${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
+    const plainText = buildContactText({company,name,email,phone,pref,referral,isOrder});
+    const subject = `${referral?`[Ref: ${referral}] `:''}${isOrder ? 'Order Request' : 'Quote Request'} — ${company}`;
 
     const submitBtn = document.getElementById('submitContactBtn');
     const originalBtnText = submitBtn.textContent;
@@ -1476,7 +1462,6 @@ function wireEvents(){
           phone: phone,
           preferred_contact: pref,
           referred_by: referral || '(not provided)',
-          referred_by_rep: repLabel || '(direct / no rep link)',
           request_type: isOrder ? 'Order Request' : 'Quote Request',
           message: plainText,
           botcheck: false
