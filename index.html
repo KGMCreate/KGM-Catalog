@@ -297,6 +297,8 @@ img{max-width:100%;display:block;}
 .tag:focus-visible{outline:2px solid var(--focus);outline-offset:1px;}
 .tag.added{background:var(--red);color:#fff;border-color:var(--red);}
 .tag.added::before{content:"✓ ";}
+.spice-benefit-note{background:var(--paper-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.82rem;line-height:1.45;color:var(--ink-soft);margin:0 0 14px;}
+.spice-benefit-note b{color:var(--ink);}
 .spice-format-picker{display:flex;flex-direction:column;gap:8px;}
 .spice-format-btn{
   display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;
@@ -815,6 +817,7 @@ footer .bottom{max-width:1240px;margin:26px auto 0;padding:16px 20px 0;border-to
   </div>
   <p class="contact-modal-sub">Pick the format(s) you're interested in for <b id="spiceFormatModalSpiceName"></b> — we'll follow up on availability and pricing.</p>
   <div class="contact-modal-body" style="padding-bottom:18px;">
+    <p class="spice-benefit-note" id="spiceBenefitNote" style="display:none;"></p>
     <div class="spice-format-picker" id="spiceFormatPicker"></div>
   </div>
 </div>
@@ -1123,6 +1126,51 @@ let contactIntent = 'quote';
 const SPICE_FORMATS = ['Consumer Jar','Food Service Jar','5lb Bag','10lb Bag','Bulk'];
 function spiceItemName(spice, format){ return `${spice} — ${format} (Spice/Seasoning)`; }
 let currentSpiceForModal = '';
+
+const SPICE_BENEFITS = {
+  'TURMERIC': "Contains curcumin — long valued in traditional cooking and medicine for its anti-inflammatory, antioxidant reputation.",
+  'GINGER': "A traditional go-to for easing nausea and supporting digestion; warming and antioxidant-rich.",
+  'CINNAMON': "Antioxidant-rich and traditionally associated with helping balance blood sugar when used regularly in the diet.",
+  'GARLIC': "Contains allicin — traditionally associated with heart and immune support.",
+  'CAYENNE PEPPER': "Contains capsaicin, prized for its warming quality and traditional metabolism-supporting reputation.",
+  'BLACK PEPPER': "Contains piperine, which may help the body absorb nutrients from other foods; traditionally warming.",
+  'WHITE PEPPER': "A milder cousin of black pepper with a similar warming, piperine-rich profile.",
+  'CUMIN': "Iron-rich and a traditional digestive aid in cuisines around the world.",
+  'CORIANDER': "Traditionally used to support digestion; a good source of antioxidants.",
+  'CARDAMOM': "Traditionally used to aid digestion and freshen breath — one of the most prized spices in the world.",
+  'CLOVES': "Contains eugenol, long used for dental and digestive comfort in traditional remedies.",
+  'NUTMEG': "Used in small amounts as a traditional aid for digestion and restful sleep.",
+  'OREGANO': "Antioxidant-rich with a traditional reputation for antimicrobial properties.",
+  'ROSEMARY': "Antioxidant-rich and traditionally associated with supporting focus and memory.",
+  'THYME': "Valued in traditional remedies for respiratory comfort and its antimicrobial reputation.",
+  'SAGE': "Traditionally used to support digestion and soothe the throat.",
+  'BASIL': "Antioxidant-rich and traditionally used to help ease everyday stress.",
+  'MINT': "A traditional aid for digestion and a natural way to freshen breath.",
+  'DILL WEED': "Traditionally used to ease digestion and reduce bloating.",
+  'FENNEL': "Traditionally chewed after meals to ease bloating and freshen breath.",
+  'FENUGREEK': "Traditionally used to support digestion and healthy blood sugar balance.",
+  'MUSTARD': "A good source of selenium and magnesium, with a traditional digestive-aid reputation.",
+  'ANISE': "Traditionally used to calm the stomach and support digestion.",
+  'BAY LEAVES': "Traditionally added to slow-cooked dishes to aid digestion.",
+  'ALL SPICE': "Contains eugenol like cloves — traditionally used to soothe digestion.",
+  'CARAWAY': "Traditionally used to ease bloating and support digestion.",
+  'PARSLEY': "A source of vitamins K and C, traditionally used to freshen breath.",
+  'MARJORAM': "Antioxidant-rich, in the same family as oregano, with a traditional digestive-support reputation.",
+  'HIBISCUS': "Antioxidant-rich; often brewed as a traditional calming tea.",
+  'LEMON GRASS': "Traditionally brewed as a calming tea and used to support digestion.",
+  'BLACK SEED': "Also known as nigella — long used in traditional medicine for its antioxidant reputation.",
+  'SUMAC': "Tangy and antioxidant-rich, a traditional favorite across Middle Eastern cooking.",
+  'CAMOMILE': "Traditionally brewed as a calming tea to support relaxation and sleep.",
+  'FLAX': "A source of omega-3s and fiber, easy to add to breads, smoothies, and baked goods.",
+};
+function spiceBenefit(spiceName){
+  const upper = (spiceName||'').toUpperCase();
+  for(const key in SPICE_BENEFITS){
+    if(upper.includes(key)) return SPICE_BENEFITS[key];
+  }
+  return null;
+}
+
 function renderSpiceFormatPicker(){
   const wrap = document.getElementById('spiceFormatPicker');
   wrap.innerHTML = SPICE_FORMATS.map(f=>{
@@ -1133,6 +1181,16 @@ function renderSpiceFormatPicker(){
 function openSpiceFormatModal(spiceName){
   currentSpiceForModal = spiceName;
   document.getElementById('spiceFormatModalSpiceName').textContent = spiceName;
+  const note = document.getElementById('spiceBenefitNote');
+  const benefit = spiceBenefit(spiceName);
+  if(note){
+    if(benefit){
+      note.innerHTML = `<b>Good to know:</b> ${esc(benefit)} <span style="opacity:.7;">(Traditional &amp; culinary use — not medical advice.)</span>`;
+      note.style.display = '';
+    } else {
+      note.style.display = 'none';
+    }
+  }
   renderSpiceFormatPicker();
   document.getElementById('spiceFormatModalOverlay').classList.add('open');
   document.getElementById('spiceFormatModal').classList.add('open');
